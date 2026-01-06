@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function RegisterPage() {
@@ -6,6 +7,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,7 +18,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await fetch("/api/loginORsignup.auth", {
+      const response = await fetch("/api/signup.auth", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -25,10 +27,10 @@ export default function RegisterPage() {
       });
 
       const data = await response.json();
-      console.log("Response data:", data);
+    
 
       if (response.ok) {
-        alert("Registration successful!");
+        router.push("/auth/login");
       } else {
         alert(`Error: ${data.message}`);
       }
