@@ -12,12 +12,14 @@ export default function Navbar() {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex space-x-6">
-          <a href="/" className="hover:text-blue-500">Home</a>
-          <a href="/blog" className="hover:text-blue-500">Blog</a>
-          <a href="/auth/login" className="hover:text-blue-500">Login</a>
+          <a href="/" className="hover:text-green-500">Home</a>
+          <a href="/blogs" className="hover:text-green-500">Blog</a>
+          <a href="@" className="hover:text-green-500">Contact Us</a>
+          <a href="@" className="hover:text-green-500">About Us</a>
         </div>
+           <a href="/auth/login" className="hover:text-white rounded-xl px-3 py-2 bg-green-400">Login</a>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Buttongreen */}
         <div className="md:hidden">
           <button onClick={() => setOpen(!open)}>
             {open ? <HiX size={28} /> : <HiMenu size={28} />}
@@ -29,7 +31,7 @@ export default function Navbar() {
       {open && (
         <div className="md:hidden bg-white px-6 pb-4 flex flex-col space-y-3">
           <a href="/" className="hover:text-blue-500">Home</a>
-          <a href="/blog" className="hover:text-blue-500">Blog</a>
+          <a href="/blogs" className="hover:text-blue-500">Blog</a>
           <a href="/auth/login" className="hover:text-blue-500">Login</a>
         </div>
       )}
