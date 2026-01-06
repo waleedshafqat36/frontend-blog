@@ -13,13 +13,14 @@ export default function LoginPage() {
     e.preventDefault();
    try {  
     // Replace with your login API endpoint
-    const response = await fetch("/api/auth/login", {
+    const response = await fetch("/api/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, password }),
     });
+console.log(response);
 
     if (response.ok) {
       // Handle successful login (e.g., redirect to dashboard)
