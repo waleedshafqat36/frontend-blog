@@ -1,15 +1,37 @@
 "use client"; // Required for useState & interactivity
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Email:", email, "Password:", password);
-    alert("Login form submitted! (UI only)");
+   try {  
+    // Replace with your login API endpoint
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (response.ok) {
+      // Handle successful login (e.g., redirect to dashboard)
+     router.push("/")
+    } else {
+      // Handle login failure (e.g., show error message)
+      console.error("Login failed");
+    }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    } 
+    
   };
 
   return (
