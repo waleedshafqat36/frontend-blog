@@ -7,7 +7,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -15,8 +15,27 @@ export default function RegisterPage() {
       return;
     }
 
-    console.log("Name:", name, "Email:", email, "Password:", password);
-    alert("Signup form submitted! (UI only)");
+    try {
+      const response = await fetch("/api/loginORsignup.auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+      console.log("Response data:", data);
+
+      if (response.ok) {
+        alert("Registration successful!");
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      alert("An error occurred. Please try again.");
+    }
   };
 
   return (
