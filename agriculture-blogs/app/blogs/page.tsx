@@ -1,7 +1,34 @@
-import React from 'react';
-import { Search, Send, ArrowRight, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+"use client";
+
+import React, { useState } from 'react';
+import { Search, Send, ArrowRight, Facebook, Twitter, Instagram, Linkedin, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const AgricultureBlog = () => {
+  const [selectedArticle, setSelectedArticle] = useState(null);
+  const router = useRouter();
+
+  const articles = [
+    {
+      id: 1,
+      title: "Delivery is reschedule for the next available time slot.",
+      description: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
+      fullContent: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+    },
+    {
+      id: 2,
+      title: "Sustainable farming practices for modern agriculture.",
+      description: "Discover innovative techniques to improve soil health and crop yield while minimizing environmental impact.",
+      fullContent: "Sustainable farming practices are essential for long-term agricultural success. By implementing crop rotation, reducing chemical usage, and employing water conservation methods, farmers can maintain productivity while protecting the ecosystem. These practices not only benefit the environment but also reduce costs and improve profitability."
+    },
+    {
+      id: 3,
+      title: "The future of organic farming in developing nations.",
+      description: "Exploring how organic farming is transforming agriculture in emerging markets and improving farmer livelihoods.",
+      fullContent: "Organic farming represents a significant opportunity for farmers in developing nations. With increasing global demand for organic products, farmers can access premium markets while adopting sustainable practices. This shift requires proper training, certification support, and market linkages to ensure success and sustainable income growth."
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900">
       {/* --- NAVBAR --- */}
@@ -51,8 +78,8 @@ const AgricultureBlog = () => {
         </p>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {[1, 2, 3].map((item) => (
-            <div key={item} className="group cursor-pointer">
+          {articles.map((article) => (
+            <div key={article.id} className="group cursor-pointer">
               <div className="overflow-hidden rounded-2xl mb-4">
                 <img 
                   src={`https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=600`} 
@@ -61,15 +88,24 @@ const AgricultureBlog = () => {
                 />
               </div>
               <h3 className="font-bold text-lg mb-2 leading-tight">
-                Delivery is reschedule for the next available time slot.
+                {article.title}
               </h3>
               <p className="text-zinc-500 text-xs mb-4">
-                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.
+                {article.description}
               </p>
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-green-600 flex items-center gap-1">
+              <div className="flex items-center justify-between gap-4">
+                <button
+                  onClick={() => setSelectedArticle(article)}
+                  className="text-xs font-bold text-green-600 flex items-center gap-1 hover:text-green-700 transition"
+                >
                    Learn More <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center text-[10px]">✓</div>
-                </span>
+                </button>
+                <button
+                  onClick={() => router.push(`/blogs/${article.id}`)}
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 transition px-3 py-1 bg-blue-50 rounded-lg"
+                >
+                  Blog
+                </button>
               </div>
             </div>
           ))}
@@ -119,6 +155,58 @@ const AgricultureBlog = () => {
         </div>
         <p className="text-center text-zinc-600 text-xs mt-8">© 2026 Agrob. All Rights Reserved.</p>
       </footer>
+
+      {/* --- MODAL --- */}
+      {selectedArticle && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white flex items-center justify-between p-6 border-b">
+              <h2 className="text-2xl font-bold text-zinc-900">Article Details</h2>
+              <button
+                onClick={() => setSelectedArticle(null)}
+                className="text-zinc-500 hover:text-zinc-700"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="p-6">
+              <img 
+                src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=800" 
+                alt={selectedArticle.title}
+                className="w-full h-64 object-cover rounded-lg mb-6"
+              />
+              
+              <h3 className="text-2xl font-bold mb-4 text-zinc-900">
+                {selectedArticle.title}
+              </h3>
+              
+              <div className="space-y-4 text-zinc-700 leading-relaxed">
+                <p>{selectedArticle.description}</p>
+                <p>{selectedArticle.fullContent}</p>
+              </div>
+
+              <div className="mt-8 flex gap-4">
+                <button
+                  onClick={() => {
+                    setSelectedArticle(null);
+                    router.push(`/blogs/${selectedArticle.id}`);
+                  }}
+                  className="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition"
+                >
+                  Read Full Article
+                </button>
+                <button
+                  onClick={() => setSelectedArticle(null)}
+                  className="flex-1 bg-zinc-200 text-zinc-900 py-3 rounded-lg font-bold hover:bg-zinc-300 transition"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

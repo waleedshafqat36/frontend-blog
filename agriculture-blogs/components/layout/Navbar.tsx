@@ -17,7 +17,7 @@ export default function Navbar() {
           <a href="@" className="hover:text-green-500">Contact Us</a>
           <a href="@" className="hover:text-green-500">About Us</a>
         </div>
-           <a href="/auth/login" className="hover:text-white rounded-xl px-3 py-2 bg-green-400">Login</a>
+           <a href="/auth/login" className="hover:text-white rounded-xl px-3 py-2 bg-green-400">Log out</a>
 
         {/* Mobile Menu Buttongreen */}
         <div className="md:hidden">
@@ -32,7 +32,7 @@ export default function Navbar() {
         <div className="md:hidden bg-white px-6 pb-4 flex flex-col space-y-3">
           <a href="/" className="hover:text-blue-500">Home</a>
           <a href="/blogs" className="hover:text-blue-500">Blog</a>
-          <a href="/auth/login" className="hover:text-blue-500">Login</a>
+          <a href="/auth/login" className="hover:text-blue-500">Logout</a>
         </div>
       )}
     </nav>
