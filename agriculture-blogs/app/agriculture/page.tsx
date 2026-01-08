@@ -21,30 +21,6 @@ const AgricultureBlog = () => {
         </button>
       </nav>
 
-      <header className="max-w-7xl mx-auto px-6 py-12 flex flex-col items-center text-center">
-  {/* Text Content (Ab yeh upar aayega aur center align hoga) */}
-  <div className="mb-10 flex flex-col items-center">
-    <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
-      Sustainable Future <br /> Insights
-    </h1>
-    <p className="text-zinc-500 text-sm md:text-base max-w-2xl mb-6">
-      We share common trends and strategies for improving your understanding and 
-      in high demand of science unique trends sources from around the world.
-    </p>
-    <a href="#" className="text-green-600 text-sm font-bold flex items-center gap-2 hover:gap-4 transition-all">
-      Learn More <ArrowRight size={16} />
-    </a>
-  </div>
-
-  {/* Image Content (Ab yeh text ke niche full width banner ban jayega) */}
-  <div className="w-full relative">
-    <img 
-      src="https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=1500" 
-      alt="Farming rows" 
-      className="rounded-3xl shadow-2xl w-full h-[300px] md:h-[500px] object-cover"
-    />
-  </div>
-</header>
 
       {/* --- TRENDING ARTICLES --- */}
       <section className="max-w-7xl mx-auto px-6 py-16">

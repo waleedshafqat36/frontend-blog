@@ -24,6 +24,14 @@ const blogSchema = new mongoose.Schema({
   image: {
     type: String, // Cloudinary secure_url
     required: [true, "Blog image is required"]
+  },
+  likes: {
+    type: [String], // Array of user IPs or user IDs
+    default: []
+  },
+  dislikes: {
+    type: [String], // Array of user IPs or user IDs
+    default: []
   }
 }, { 
   timestamps: true 

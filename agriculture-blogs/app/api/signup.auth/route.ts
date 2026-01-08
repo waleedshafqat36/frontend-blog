@@ -1,7 +1,8 @@
 import ConnectDB from "@/lib/db";
-import User from "../../../models/user";
+import User from "@/models/user";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { RollerCoaster } from "lucide-react";
 
 
 export async function POST(req: Request) {
@@ -26,6 +27,7 @@ export async function POST(req: Request) {
       name,
       email,
       password: hashedPassword,
+      role: "user",
     });
 
     return NextResponse.json(

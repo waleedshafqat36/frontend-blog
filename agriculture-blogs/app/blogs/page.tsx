@@ -9,14 +9,45 @@ interface Article {
   image: string;
   title: string;
   content: string;
-  description: string;
   fullContent: string;
+}
+
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
 }
 
 const AgricultureBlog = () => {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
+
+  // Function to truncate content to 100 characters
+  const truncateContent = (content: string, maxLength: number = 100) => {
+    if (!content) return '';
+    if (content.length <= maxLength) return content;
+    return content.substring(0, maxLength) + '...';
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    router.push('/auth/login');
+  };
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Error parsing user from localStorage:", error);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     // Fetch articles from API if needed
       const fetchArticles = async () => {
@@ -31,27 +62,29 @@ const AgricultureBlog = () => {
 
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900">
-      {/* --- NAVBAR --- */} 
-     {/* <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+      {/* --- NAVBAR --- */}
+      <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold italic">G</div>
           <span className="text-xl font-bold text-green-700">Agrob</span>
         </div>
         <div className="hidden md:flex gap-8 text-sm font-medium text-zinc-600">
-        
           <a href="/" className="hover:text-green-600">Home</a>
+          <a href="/blogs" className="hover:text-green-600">Blogs</a>
           <a href="#" className="hover:text-green-600">About</a>
-          <a href="#" className="hover:text-green-600">Blogs</a>
           <a href="#" className="hover:text-green-600">Service</a>
-           <a href="#" className="hover:text-green-500">Contact</a>
-       
+          <a href="#" className="hover:text-green-500">Contact</a>
+          {user?.role === 'admin' && (
+            <a href="/Admin" className="hover:text-green-500">Admin</a>
+          )}
         </div>
-        <a className="bg-red-600 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-red-700 duration-500 cursor-pointer transition-all">
-        Log out
-        </a>
-      </nav> */}
-
-      {/* --- HERO SECTION --- */}
+        <button 
+          onClick={handleLogout}
+          className="bg-red-600 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-red-700 duration-500 cursor-pointer transition-all"
+        >
+          Log out
+        </button>
+      </nav>      {/* --- HERO SECTION --- */}
       <header className="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-2 gap-8 items-center">
         <div>
           <h1 className="text-5xl font-bold leading-tight mb-6">
@@ -94,7 +127,7 @@ const AgricultureBlog = () => {
                 {article?.title}
               </h3>
               <p className="text-zinc-500 text-xs mb-4">
-                {article?.content}
+                {truncateContent(article?.content || '', 100)}
               </p>
               <div className="flex items-center justify-between gap-4">
                 <button
@@ -185,7 +218,6 @@ const AgricultureBlog = () => {
               </h3>
               
               <div className="space-y-4 text-zinc-700 leading-relaxed">
-                <p>{selectedArticle?.description}</p>
                 <p>{selectedArticle?.fullContent}</p>
               </div>
 

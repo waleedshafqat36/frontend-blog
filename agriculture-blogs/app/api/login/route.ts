@@ -37,6 +37,11 @@ export async function POST(req: Request) {
       );
     }
 
+    // 4. Add role field if it doesn't exist
+    if (!user.role) {
+      user.role = "user";
+      await user.save();
+    }
 
     return NextResponse.json(
       {
