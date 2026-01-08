@@ -19,6 +19,7 @@ export default function Navbar() {
           <a href="/blogs" className="hover:text-green-600">Blogs</a>
           <a href="#" className="hover:text-green-600">Service</a>
            <a href="#" className="hover:text-green-500">Contact</a>
+           <a href="/Admin" className="hover:text-green-500">Admin</a>
         </div>
            <a href="/auth/login" className="hover:text-white rounded-xl px-3 py-2 bg-red-500">Log out</a>
 
