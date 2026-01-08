@@ -4,9 +4,18 @@ import React, { useEffect, useState } from 'react';
 import { Search, Send, ArrowRight, Facebook, Twitter, Instagram, Linkedin, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+interface Article {
+  _id: string;
+  image: string;
+  title: string;
+  content: string;
+  description: string;
+  fullContent: string;
+}
+
 const AgricultureBlog = () => {
-  const [selectedArticle, setSelectedArticle] = useState(null);
-  const [articles, setArticles] = useState([]);
+  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [articles, setArticles] = useState<Article[]>([]);
   const router = useRouter();
   useEffect(() => {
     // Fetch articles from API if needed
@@ -59,7 +68,7 @@ const AgricultureBlog = () => {
           <img 
             src="https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=1000" 
             alt="Farming rows" 
-            className="rounded-3xl shadow-xl w-full h-[400px] object-cover"
+            className="rounded-3xl shadow-xl w-full h-96 object-cover"
           />
         </div>
       </header>
@@ -76,16 +85,16 @@ const AgricultureBlog = () => {
             <div key={index} className="group cursor-pointer">
               <div className="overflow-hidden rounded-2xl mb-4 ">
                 <img 
-                  src={article.image} 
+                  src={article?.image || ''} 
                   alt="Agriculture" 
                   className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               </div>
               <h3 className="font-bold text-lg mb-2 leading-tight">
-                {article.title}
+                {article?.title}
               </h3>
               <p className="text-zinc-500 text-xs mb-4">
-                {article.content}
+                {article?.content}
               </p>
               <div className="flex items-center justify-between gap-4">
                 <button
@@ -95,7 +104,7 @@ const AgricultureBlog = () => {
                    Learn More <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center text-[10px]">✓</div>
                 </button>
                 <button
-                  onClick={() => router.push(`/blogs/${article._id}`)}
+                  onClick={() => router.push(`/blogs/${article?._id}`)}
                   className="text-xs font-bold  hover:text-white transition px-3 py-2 cursor-pointer bg-green-500 rounded-lg"
                 >
                   Blog
@@ -167,24 +176,26 @@ const AgricultureBlog = () => {
             <div className="p-6">
               <img 
                 src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=800" 
-                alt={selectedArticle.title}
+                alt={selectedArticle?.title || 'Article'}
                 className="w-full h-64 object-cover rounded-lg mb-6"
               />
               
               <h3 className="text-2xl font-bold mb-4 text-zinc-900">
-                {selectedArticle.title}
+                {selectedArticle?.title}
               </h3>
               
               <div className="space-y-4 text-zinc-700 leading-relaxed">
-                <p>{selectedArticle.description}</p>
-                <p>{selectedArticle.fullContent}</p>
+                <p>{selectedArticle?.description}</p>
+                <p>{selectedArticle?.fullContent}</p>
               </div>
 
               <div className="mt-8 flex gap-4">
                 <button
                   onClick={() => {
-                    setSelectedArticle(null);
-                    router.push(`/blogs/${selectedArticle.id}`);
+                    if (selectedArticle?._id) {
+                      setSelectedArticle(null);
+                      router.push(`/blogs/${selectedArticle._id}`);
+                    }
                   }}
                   className="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition"
                 >
