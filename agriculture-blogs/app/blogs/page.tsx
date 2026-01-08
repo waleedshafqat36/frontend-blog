@@ -68,12 +68,12 @@ const AgricultureBlog = () => {
       <section className="max-w-7xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-bold mb-2">Our Trending Article</h2>
         <p className="text-zinc-400 text-sm mb-12 max-w-2xl">
-          Contrary to popular belief, Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+          
         </p>
 
         <div className="grid md:grid-cols-4 gap-8">
           {articles.map((article, index) => (
-            <div key={index} className="group cursor-pointer">
+            <div key={index} className="group cursor-pointer"  onClick={() => router.push(`/blogs/${article._id}`)}>
               <div className="overflow-hidden rounded-2xl mb-4 ">
                 <img 
                   src={article.image} 
@@ -95,7 +95,7 @@ const AgricultureBlog = () => {
                    Learn More <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center text-[10px]">✓</div>
                 </button>
                 <button
-                  onClick={() => router.push(`/blogs/${article._id}`)}
+               
                   className="text-xs font-bold  hover:text-white transition px-3 py-2 cursor-pointer bg-green-500 rounded-lg"
                 >
                   Blog
