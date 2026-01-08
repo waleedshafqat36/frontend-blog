@@ -1,52 +1,46 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search, Send, ArrowRight, Facebook, Twitter, Instagram, Linkedin, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 const AgricultureBlog = () => {
   const [selectedArticle, setSelectedArticle] = useState(null);
+  const [articles, setArticles] = useState([]);
   const router = useRouter();
+  useEffect(() => {
+    // Fetch articles from API if needed
+      const fetchArticles = async () => {
+        // Example fetch call
+        const response = await fetch('/api/blog');
+        const data = await response.json();
+        setArticles(data.blogs);
+      };
+      fetchArticles();
+  }, []);
 
-  const articles = [
-    {
-      id: 1,
-      title: "Delivery is reschedule for the next available time slot.",
-      description: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
-      fullContent: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
-    },
-    {
-      id: 2,
-      title: "Sustainable farming practices for modern agriculture.",
-      description: "Discover innovative techniques to improve soil health and crop yield while minimizing environmental impact.",
-      fullContent: "Sustainable farming practices are essential for long-term agricultural success. By implementing crop rotation, reducing chemical usage, and employing water conservation methods, farmers can maintain productivity while protecting the ecosystem. These practices not only benefit the environment but also reduce costs and improve profitability."
-    },
-    {
-      id: 3,
-      title: "The future of organic farming in developing nations.",
-      description: "Exploring how organic farming is transforming agriculture in emerging markets and improving farmer livelihoods.",
-      fullContent: "Organic farming represents a significant opportunity for farmers in developing nations. With increasing global demand for organic products, farmers can access premium markets while adopting sustainable practices. This shift requires proper training, certification support, and market linkages to ensure success and sustainable income growth."
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900">
-      {/* --- NAVBAR --- */}
-      {/* <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+      {/* --- NAVBAR --- */} 
+     <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold italic">G</div>
           <span className="text-xl font-bold text-green-700">Agrob</span>
         </div>
         <div className="hidden md:flex gap-8 text-sm font-medium text-zinc-600">
-          <a href="#" className="hover:text-green-600">Home</a>
+        
+          <a href="/" className="hover:text-green-600">Home</a>
           <a href="#" className="hover:text-green-600">About</a>
+          <a href="#" className="hover:text-green-600">Blogs</a>
           <a href="#" className="hover:text-green-600">Service</a>
-          <a href="#" className="hover:text-green-600">Blog</a>
+           <a href="#" className="hover:text-green-500">Contact</a>
+       
         </div>
-        <button className="bg-green-600 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-green-700 transition-all">
-          Contact
-        </button>
-      </nav> */}
+        <a className="bg-red-600 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-red-700 duration-500 cursor-pointer transition-all">
+        Log out
+        </a>
+      </nav>
 
       {/* --- HERO SECTION --- */}
       <header className="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-2 gap-8 items-center">
@@ -77,32 +71,32 @@ const AgricultureBlog = () => {
           Contrary to popular belief, Lorem Ipsum is simply dummy text of the printing and typesetting industry.
         </p>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {articles.map((article) => (
-            <div key={article.id} className="group cursor-pointer">
-              <div className="overflow-hidden rounded-2xl mb-4">
+        <div className="grid md:grid-cols-4 gap-8">
+          {articles.map((article, index) => (
+            <div key={index} className="group cursor-pointer">
+              <div className="overflow-hidden rounded-2xl mb-4 ">
                 <img 
-                  src={`https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=600`} 
+                  src={article.image} 
                   alt="Agriculture" 
-                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               </div>
               <h3 className="font-bold text-lg mb-2 leading-tight">
                 {article.title}
               </h3>
               <p className="text-zinc-500 text-xs mb-4">
-                {article.description}
+                {article.content}
               </p>
               <div className="flex items-center justify-between gap-4">
                 <button
-                  onClick={() => setSelectedArticle(article)}
+                 
                   className="text-xs font-bold text-green-600 flex items-center gap-1 hover:text-green-700 transition"
                 >
                    Learn More <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center text-[10px]">✓</div>
                 </button>
                 <button
-                  onClick={() => router.push(`/blogs/${article.id}`)}
-                  className="text-xs font-bold text-blue-600 hover:text-blue-700 transition px-3 py-1 bg-blue-50 rounded-lg"
+                  onClick={() => router.push(`/blogs/${article._id}`)}
+                  className="text-xs font-bold  hover:text-white transition px-3 py-2 cursor-pointer bg-green-500 rounded-lg"
                 >
                   Blog
                 </button>
