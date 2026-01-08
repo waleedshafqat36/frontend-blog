@@ -8,30 +8,44 @@ import { BsInstagram, BsTwitter } from "react-icons/bs";
 
 const BlogPost = () => {
   const router = useRouter();
-  const [blog, setBlog] = useState([])
+  const [blog, setBlog] = useState(null); // Initial state null rakhein
+  const [relatedBlogs, setRelatedBlogs] = useState([]); // Related blogs ke liye alag state
   const params = useParams();
   const blogId = params.id;
-  console.log("Blog ID:", blogId);
+
   useEffect(() => {
     const fetchBlogDetails = async () => {
-      try { 
+      try {
         const response = await fetch(`/api/blog/${blogId}`);
-        const data = await response.json(); 
+        const data = await response.json();
         if (response.ok) {
           setBlog(data.detailsBlog);
+          
+          // --- Related blogs fetch karein (Category ke base par) ---
+          fetchRelated(data.detailsBlog.category, blogId);
         }
       } catch (error) {
         console.error("Error fetching blog details:", error);
-      } 
+      }
     };
-    fetchBlogDetails();
+
+    const fetchRelated = async (category, currentId) => {
+        try {
+            // Aapka existing GET /api/blog use kar sakte hain ya naya filter wala endpoint
+            const res = await fetch(`/api/blog`); 
+            const data = await res.json();
+            if (res.ok) {
+                // Current blog ko hata kar baki filter karein
+                const filtered = data.blogs.filter(b => b._id !== currentId && b.category === category);
+                setRelatedBlogs(filtered.slice(0, 3));
+            }
+        } catch (err) {
+            console.log("Related fetch error", err);
+        }
+    }
+
+    if (blogId) fetchBlogDetails();
   }, [blogId]);
-
-
-  // Sample blog data
-
-
-  // const blog = blogs[blogId as keyof typeof blogs];
 
   if (!blog) {
     return (
@@ -115,28 +129,35 @@ const BlogPost = () => {
       </section>
 
       {/* Related Articles Section */}
+     {/* Related Articles Section - Updated Logic */}
       <section className="max-w-4xl mx-auto px-6 py-12 border-t border-zinc-200">
         <h3 className="text-2xl font-bold mb-8">Related Articles</h3>
         <div className="grid md:grid-cols-3 gap-6">
-          {Object.values(blog).filter((b) => b.id !== blog._id).slice(0, 4).map((relatedBlog) => (
-            <div
-              key={relatedBlog.id}
-              className="group cursor-pointer border border-zinc-200 rounded-lg overflow-hidden hover:shadow-lg transition"
-              onClick={() => router.push(`/blogs/${relatedBlog.id}`)}
-            >
-              <img
-                src={relatedBlog.image}
-                alt={relatedBlog.title}
-                className="w-full h-40 object-cover group-hover:scale-105 transition-transform"
-              />
-              <div className="p-4">
-                <h4 className="font-bold text-lg mb-2 group-hover:text-green-600 transition">
-                  {relatedBlog.title}
-                </h4>
-                <p className="text-zinc-600 text-sm">{relatedBlog.date}</p>
+          {relatedBlogs.length > 0 ? (
+            relatedBlogs.map((related, index) => (
+              <div
+                key={index}
+                className="group cursor-pointer border border-zinc-200 rounded-lg overflow-hidden hover:shadow-lg transition"
+                onClick={() => router.push(`/blogs/${related._id}`)} // Check karein path blogs hai ya blog
+              >
+                <img
+                  src={related.image}
+                  alt={related.title}
+                  className="w-full h-40 object-cover group-hover:scale-105 transition-transform"
+                />
+                <div className="p-4">
+                  <h4 className="font-bold text-lg mb-2 group-hover:text-green-600 transition">
+                    {related.title}
+                  </h4>
+                  <p className="text-zinc-600 text-sm">
+                    {new Date(related.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-zinc-500">No related articles found.</p>
+          )}
         </div>
       </section>
 

@@ -2,7 +2,6 @@ import { log } from "console";
 import mongoose  from "mongoose";
 
 const MONGO_URI = process.env.MONGODB_URL
-console.log("MongoDB URI:", MONGO_URI); // <-- Log the URI for debugging
 
 if (!MONGO_URI) {
   throw new Error("please define mongodb uri in env file");

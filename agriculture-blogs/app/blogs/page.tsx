@@ -23,7 +23,7 @@ const AgricultureBlog = () => {
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900">
       {/* --- NAVBAR --- */} 
-     <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+     {/* <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold italic">G</div>
           <span className="text-xl font-bold text-green-700">Agrob</span>
@@ -40,7 +40,7 @@ const AgricultureBlog = () => {
         <a className="bg-red-600 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-red-700 duration-500 cursor-pointer transition-all">
         Log out
         </a>
-      </nav>
+      </nav> */}
 
       {/* --- HERO SECTION --- */}
       <header className="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-2 gap-8 items-center">

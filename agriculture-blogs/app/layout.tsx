@@ -7,7 +7,7 @@ import "./globals.css";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const hideNavbar = pathname === "/auth/login" || pathname === "/auth/register" || pathname.startsWith("/blogs");
+  const hideNavbar = pathname === "/Admin" || pathname === "/auth/login" || pathname === "/auth/register" || pathname.startsWith("/blogs");
 
   return (
     <html lang="en">
