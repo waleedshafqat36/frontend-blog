@@ -54,6 +54,8 @@ export async function GET() {
     const content = formData.get("content") as string;
     const file = formData.get("image") as File;
 
+    console.log("Received data:", { title, author, category, content, fileName: file?.name });
+
     if (!file) {
       return NextResponse.json({ message: "Image is missing" }, { status: 400 });
     }

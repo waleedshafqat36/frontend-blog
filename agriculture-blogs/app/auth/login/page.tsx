@@ -8,31 +8,38 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-   try {  
-    // Replace with your login API endpoint
-    const response = await fetch("/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
-console.log(response);
+    try {
+      // Call your login API
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (response.ok) {
-      // Handle successful login (e.g., redirect to dashboard)
-     router.push("/")
-    } else {
-      // Handle login failure (e.g., show error message)
-      console.error("Login failed");
-    }
+      if (response.ok) {
+        const data = await response.json();
+
+        if (data.user) {
+          // Store user data in localStorage
+          localStorage.setItem("user", JSON.stringify(data.user));
+          console.log("User data stored:", data.user);
+
+          // Redirect to homepage for all users
+          router.push("/");
+        }
+      } else {
+        // Handle login failure
+        const errorData = await response.json();
+        alert(errorData.message || "Login failed. Please check your credentials.");
+      }
     } catch (error) {
       console.error("An error occurred:", error);
-    } 
-    
+      alert("An error occurred. Please try again.");
+    }
   };
 
   return (

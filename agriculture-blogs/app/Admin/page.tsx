@@ -32,7 +32,7 @@ const AddBlogForm = () => {
     data.append('content', formData.content);
     if (image) data.append('image', image);
   
-    
+    console.log("Submitting form");
 
     try {
       const response = await fetch('/api/blog', {
@@ -124,7 +124,7 @@ const AddBlogForm = () => {
                   onChange={handleChange}
                   rows={5} 
                   placeholder="Start typing..." 
-                  className="w-full px-6 py-5 rounded-[2rem] bg-slate-50 border border-slate-200 focus:border-green-500 outline-none transition-all resize-none"
+                  className="w-full px-6 py-5 rounded-4xl bg-slate-50 border border-slate-200 focus:border-green-500 outline-none transition-all resize-none"
                 ></textarea>
               </div>
             </div>
@@ -142,7 +142,7 @@ const AddBlogForm = () => {
                   if (e.target.files && e.target.files[0]) {
                        setImage(e.target.files[0]); 
                            }}}   />
-                <div className={`w-full h-full min-h-[300px] border-4 border-dashed rounded-[3rem] flex flex-col items-center justify-center p-10 transition-all ${image ? 'border-green-500 bg-green-50' : 'border-slate-100 bg-slate-50/50 group-hover:bg-green-50 group-hover:border-green-200'}`}>
+                <div className={`w-full h-full min-h-75 border-4 border-dashed rounded-[3rem] flex flex-col items-center justify-center p-10 transition-all ${image ? 'border-green-500 bg-green-50' : 'border-slate-100 bg-slate-50/50 group-hover:bg-green-50 group-hover:border-green-200'}`}>
                   <div className="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center mb-6 text-green-500">
                     <UploadCloud size={40} />
                   </div>
