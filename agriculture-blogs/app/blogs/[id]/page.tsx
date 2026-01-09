@@ -27,8 +27,8 @@ interface User {
 
 const BlogPost = () => {
   const router = useRouter();
-  const [blog, setBlog] = useState<Blog | null>(null); // Initial state null rakhein
-  const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]); // Related blogs ke liye alag state
+  const [blog, setBlog] = useState<Blog | null>(null);
+  const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const [userLiked, setUserLiked] = useState(false);
@@ -118,22 +118,29 @@ const BlogPost = () => {
         body: JSON.stringify({ userId, action }),
       });
 
-      const data = await response.json();
       if (response.ok) {
-        setLikes(data.likes);
-        setDislikes(data.dislikes);
+        // Refetch the blog to get updated likes/dislikes from all users
+        const blogResponse = await fetch(`/api/blog/${blogId}`);
+        const blogData = await blogResponse.json();
         
-        if (action === "like") {
-          setUserLiked(!userLiked);
-          if (userDisliked) setUserDisliked(false);
-        } else {
-          setUserDisliked(!userDisliked);
-          if (userLiked) setUserLiked(false);
+        if (blogResponse.ok && blogData.detailsBlog) {
+          setBlog(blogData.detailsBlog);
+          setLikes(blogData.detailsBlog.likes?.length || 0);
+          setDislikes(blogData.detailsBlog.dislikes?.length || 0);
+          
+          // Update user's like/dislike status
+          setUserLiked(blogData.detailsBlog.likes?.includes(userId) || false);
+          setUserDisliked(blogData.detailsBlog.dislikes?.includes(userId) || false);
         }
       }
     } catch (error) {
       console.error("Error:", error);
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    router.push('/auth/login');
   };
 
   if (!blog) {
@@ -170,9 +177,12 @@ const BlogPost = () => {
             <a href="/Admin" className="hover:text-green-500">Admin</a>
           )}
         </div>
-        <a className="bg-red-600 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-red-700 duration-500 cursor-pointer transition-all">
+        <button 
+          onClick={handleLogout}
+          className="bg-red-600 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-red-700 duration-500 cursor-pointer transition-all"
+        >
           Log out
-        </a>
+        </button>
       </nav>
 
       {/* Back Button */}
@@ -233,7 +243,7 @@ const BlogPost = () => {
               }`}
             >
               <ThumbsUp size={16} />
-              {userLiked && <span>{likes}</span>}
+              <span>{likes}</span>
             </button>
             <button
               onClick={() => handleLikeDislike("dislike")}
@@ -244,7 +254,7 @@ const BlogPost = () => {
               }`}
             >
               <ThumbsDown size={16} />
-              {userDisliked && <span>{dislikes}</span>}
+              <span>{dislikes}</span>
             </button>
           </div>
         </div>

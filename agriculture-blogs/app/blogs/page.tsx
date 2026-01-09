@@ -87,7 +87,7 @@ const AgricultureBlog = () => {
       </nav>      {/* --- HERO SECTION --- */}
       <header className="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-2 gap-8 items-center">
         <div>
-          <h1 className="text-5xl font-bold leading-tight mb-6">
+          <h1 className="text-5xl font-bold hover:animate-bounce transition duration-300 hover:text-green-600 hover:drop-shadow-lg mb-6">
             Sustainable Future <br /> Insights
           </h1>
           <p className="text-zinc-500 text-sm max-w-sm mb-4">
@@ -118,6 +118,7 @@ const AgricultureBlog = () => {
             <div key={index} className="group cursor-pointer">
               <div className="overflow-hidden rounded-2xl mb-4 ">
                 <img 
+                onClick={()=>router.push(`/blogs/${article?._id}`)}
                   src={article?.image || ''} 
                   alt="Agriculture" 
                   className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500"
@@ -131,17 +132,12 @@ const AgricultureBlog = () => {
               </p>
               <div className="flex items-center justify-between gap-4">
                 <button
-                 
+                 onClick={() => router.push(`/blogs/${article?._id}`)}
                   className="text-xs font-bold text-green-600 flex items-center gap-1 hover:text-green-700 transition"
                 >
                    Learn More <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center text-[10px]">✓</div>
                 </button>
-                <button
-                  onClick={() => router.push(`/blogs/${article?._id}`)}
-                  className="text-xs font-bold  hover:text-white transition px-3 py-2 cursor-pointer bg-green-500 rounded-lg"
-                >
-                  Blog
-                </button>
+             
               </div>
             </div>
           ))}
