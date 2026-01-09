@@ -1,5 +1,24 @@
 import mongoose from "mongoose";
 
+const commentSchema = new mongoose.Schema({
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: () => new mongoose.Types.ObjectId()
+  },
+  author: {
+    type: String,
+    required: true
+  },
+  text: {
+    type: String,
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+}, { _id: true });
+
 const blogSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -25,12 +44,24 @@ const blogSchema = new mongoose.Schema({
     type: String, // Cloudinary secure_url
     required: [true, "Blog image is required"]
   },
-  likes: {
-    type: [String], // Array of user IPs or user IDs
+  likeCount: {
+    type: Number,
+    default: 0
+  },
+  dislikeCount: {
+    type: Number,
+    default: 0
+  },
+  likedBy: {
+    type: [String], // Array of user IDs to prevent duplicate likes
     default: []
   },
-  dislikes: {
-    type: [String], // Array of user IPs or user IDs
+  dislikedBy: {
+    type: [String], // Array of user IDs to prevent duplicate dislikes
+    default: []
+  },
+  comments: {
+    type: [commentSchema],
     default: []
   }
 }, { 

@@ -21,44 +21,66 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ message: "Blog not found" }, { status: 404 });
     }
 
-    // Remove user from opposite reaction
+    let updateQuery: any = {};
+    let userAlreadyLiked = false;
+    let userAlreadyDisliked = false;
+
     if (action === "like") {
-      blog.likes = blog.likes || [];
-      blog.dislikes = blog.dislikes || [];
+      blog.likedBy = blog.likedBy || [];
+      blog.dislikedBy = blog.dislikedBy || [];
 
-      // Remove from dislikes if exists
-      blog.dislikes = blog.dislikes.filter((dislike: string) => dislike !== userId);
+      userAlreadyLiked = blog.likedBy.includes(userId);
+      userAlreadyDisliked = blog.dislikedBy.includes(userId);
 
-      // Add to likes if not already there
-      if (!blog.likes.includes(userId)) {
-        blog.likes.push(userId);
+      if (!userAlreadyLiked) {
+        // User hasn't liked yet, so add the like
+        updateQuery.$inc = { likeCount: 1 };
+        updateQuery.$push = { likedBy: userId };
+
+        // If user had disliked before, remove dislike
+        if (userAlreadyDisliked) {
+          updateQuery.$inc.dislikeCount = -1;
+          updateQuery.$pull = { dislikedBy: userId };
+        }
       } else {
-        // Toggle: remove if already liked
-        blog.likes = blog.likes.filter((like: string) => like !== userId);
+        // User already liked, so remove the like (toggle)
+        updateQuery.$inc = { likeCount: -1 };
+        updateQuery.$pull = { likedBy: userId };
       }
     } else if (action === "dislike") {
-      blog.likes = blog.likes || [];
-      blog.dislikes = blog.dislikes || [];
+      blog.likedBy = blog.likedBy || [];
+      blog.dislikedBy = blog.dislikedBy || [];
 
-      // Remove from likes if exists
-      blog.likes = blog.likes.filter((like: string) => like !== userId);
+      userAlreadyLiked = blog.likedBy.includes(userId);
+      userAlreadyDisliked = blog.dislikedBy.includes(userId);
 
-      // Add to dislikes if not already there
-      if (!blog.dislikes.includes(userId)) {
-        blog.dislikes.push(userId);
+      if (!userAlreadyDisliked) {
+        // User hasn't disliked yet, so add the dislike
+        updateQuery.$inc = { dislikeCount: 1 };
+        updateQuery.$push = { dislikedBy: userId };
+
+        // If user had liked before, remove like
+        if (userAlreadyLiked) {
+          updateQuery.$inc.likeCount = -1;
+          updateQuery.$pull = { likedBy: userId };
+        }
       } else {
-        // Toggle: remove if already disliked
-        blog.dislikes = blog.dislikes.filter((dislike: string) => dislike !== userId);
+        // User already disliked, so remove the dislike (toggle)
+        updateQuery.$inc = { dislikeCount: -1 };
+        updateQuery.$pull = { dislikedBy: userId };
       }
     }
 
-    await blog.save();
+    // Execute the update with $inc operator
+    const updatedBlog = await Blog.findByIdAndUpdate(id, updateQuery, { new: true });
 
     return NextResponse.json(
       {
         success: true,
-        likes: blog.likes.length,
-        dislikes: blog.dislikes.length,
+        likeCount: updatedBlog?.likeCount || 0,
+        dislikeCount: updatedBlog?.dislikeCount || 0,
+        userLiked: updatedBlog?.likedBy?.includes(userId) || false,
+        userDisliked: updatedBlog?.dislikedBy?.includes(userId) || false,
       },
       { status: 200 }
     );

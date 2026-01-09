@@ -3,7 +3,7 @@
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, Facebook, Twitter, Instagram, Linkedin, ThumbsUp, ThumbsDown } from "lucide-react";
 import { useEffect, useState } from "react";
-import { FaFacebook, FaLinkedin } from "react-icons/fa";
+import { FaFacebook, FaLinkedin, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { BsInstagram, BsTwitter } from "react-icons/bs";
 
 interface Blog {
@@ -16,6 +16,14 @@ interface Blog {
   content: string;
   likes?: string[];
   dislikes?: string[];
+  comments?: Comment[];
+}
+
+interface Comment {
+  _id: string;
+  author: string;
+  text: string;
+  createdAt: string;
 }
 
 interface User {
@@ -35,6 +43,10 @@ const BlogPost = () => {
   const [userDisliked, setUserDisliked] = useState(false);
   const [userId, setUserId] = useState<string>("");
   const [user, setUser] = useState<User | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentText, setCommentText] = useState("");
+  const [commentAuthor, setCommentAuthor] = useState("");
+  const [isLoadingComment, setIsLoadingComment] = useState(false);
   const params = useParams();
   const blogId = params.id as string | string[] | undefined;
 
@@ -62,6 +74,8 @@ const BlogPost = () => {
   }, []);
 
   useEffect(() => {
+    if (!blogId) return;
+
     const fetchBlogDetails = async () => {
       try {
         const response = await fetch(`/api/blog/${blogId}`);
@@ -69,13 +83,18 @@ const BlogPost = () => {
         if (response.ok) {
           console.log("Blog data received:", data.detailsBlog);
           setBlog(data.detailsBlog);
-          setLikes(data.detailsBlog.likes?.length || 0);
-          setDislikes(data.detailsBlog.dislikes?.length || 0);
+          setLikes(data.detailsBlog.likeCount || 0);
+          setDislikes(data.detailsBlog.dislikeCount || 0);
+          
+          // Properly set comments from database
+          const blogComments = data.detailsBlog.comments || [];
+          setComments(blogComments);
+          console.log("Comments loaded:", blogComments);
           
           // Check if current user has liked or disliked
           if (userId) {
-            setUserLiked(data.detailsBlog.likes?.includes(userId) || false);
-            setUserDisliked(data.detailsBlog.dislikes?.includes(userId) || false);
+            setUserLiked(data.detailsBlog.likedBy?.includes(userId) || false);
+            setUserDisliked(data.detailsBlog.dislikedBy?.includes(userId) || false);
           }
           
           // --- Related blogs fetch karein (Category ke base par) ---
@@ -90,11 +109,9 @@ const BlogPost = () => {
 
     const fetchRelated = async (category: string, currentId: string | string[]) => {
         try {
-            // Aapka existing GET /api/blog use kar sakte hain ya naya filter wala endpoint
             const res = await fetch(`/api/blog`); 
             const data = await res.json();
             if (res.ok) {
-                // Current blog ko hata kar baki filter karein
                 const filtered = data.blogs.filter((b: Blog) => b._id !== currentId && b.category === category);
                 setRelatedBlogs(filtered.slice(0, 3));
             }
@@ -103,8 +120,8 @@ const BlogPost = () => {
         }
     }
 
-    if (blogId) fetchBlogDetails();
-  }, [blogId, userId]);
+    fetchBlogDetails();
+  }, [blogId]);
 
   const handleLikeDislike = async (action: "like" | "dislike") => {
     if (!userId || !blogId) return;
@@ -119,22 +136,45 @@ const BlogPost = () => {
       });
 
       if (response.ok) {
-        // Refetch the blog to get updated likes/dislikes from all users
-        const blogResponse = await fetch(`/api/blog/${blogId}`);
-        const blogData = await blogResponse.json();
-        
-        if (blogResponse.ok && blogData.detailsBlog) {
-          setBlog(blogData.detailsBlog);
-          setLikes(blogData.detailsBlog.likes?.length || 0);
-          setDislikes(blogData.detailsBlog.dislikes?.length || 0);
-          
-          // Update user's like/dislike status
-          setUserLiked(blogData.detailsBlog.likes?.includes(userId) || false);
-          setUserDisliked(blogData.detailsBlog.dislikes?.includes(userId) || false);
-        }
+        const data = await response.json();
+        // Update state with counts from API (using $inc, so these are always accurate)
+        setLikes(data.likeCount);
+        setDislikes(data.dislikeCount);
+        setUserLiked(data.userLiked);
+        setUserDisliked(data.userDisliked);
       }
     } catch (error) {
       console.error("Error:", error);
+    }
+  };
+
+  const handleAddComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commentText.trim() || !commentAuthor.trim() || !blogId) return;
+
+    setIsLoadingComment(true);
+    try {
+      const response = await fetch(`/api/blog/${blogId}/comment`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ author: commentAuthor, text: commentText }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Comment posted successfully:", data.comments);
+        setComments(data.comments || []);
+        setCommentText("");
+        setCommentAuthor("");
+      } else {
+        console.error("Failed to post comment");
+      }
+    } catch (error) {
+      console.error("Error posting comment:", error);
+    } finally {
+      setIsLoadingComment(false);
     }
   };
 
@@ -161,39 +201,63 @@ const BlogPost = () => {
 
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900">
+      <style>{`
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        .animate-slideInLeft { animation: slideInLeft 0.6s ease-out; }
+      `}</style>
+      
       {/* --- NAVBAR --- */}
-      <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold italic">G</div>
-          <span className="text-xl font-bold text-green-700">Agrob</span>
+      <nav className="flex items-center justify-between px-8 md:px-16 py-4 max-w-7xl mx-auto animate-slideInLeft border-b border-zinc-200">
+        <div className="flex items-center gap-2 group">
+          <div className="w-8 h-8 bg-linear-to-br from-green-600 to-green-700 rounded-full flex items-center justify-center text-white font-bold italic group-hover:scale-110 transition-transform duration-300">G</div>
+          <span className="text-xl font-bold bg-linear-to-r from-green-600 to-green-700 bg-clip-text text-transparent">Agrob</span>
         </div>
         <div className="hidden md:flex gap-8 text-sm font-medium text-zinc-600">
-          <a href="/" className="hover:text-green-600">Home</a>
-          <a href="/blogs" className="hover:text-green-600">Blogs</a>
-          <a href="#" className="hover:text-green-600">About</a>
-          <a href="#" className="hover:text-green-600">Service</a>
-          <a href="#" className="hover:text-green-500">Contact</a>
+          <a href="/" className="hover:text-green-600 transition duration-300 relative group">
+            Home
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
+          </a>
+          <a href="/blogs" className="hover:text-green-600 transition duration-300 relative group">
+            Blogs
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
+          </a>
+          <a href="#" className="hover:text-green-600 transition duration-300 relative group">
+            About
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
+          </a>
+          <a href="#" className="hover:text-green-600 transition duration-300 relative group">
+            Service
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
+          </a>
+          <a href="#" className="hover:text-green-500 transition duration-300 relative group">
+            Contact
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
+          </a>
           {user?.role === 'admin' && (
-            <a href="/Admin" className="hover:text-green-500">Admin</a>
+            <a href="/Admin" className="hover:text-green-500 transition duration-300 relative group">
+              Admin
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
+            </a>
           )}
         </div>
         <button 
           onClick={handleLogout}
-          className="bg-red-600 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-red-700 duration-500 cursor-pointer transition-all"
+          className="bg-linear-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-full text-sm font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
         >
           Log out
         </button>
       </nav>
 
-      {/* Back Button */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-green-600 font-bold hover:text-green-700 transition mb-6"
-        >
-          <ArrowLeft size={20} /> Back to Blogs
-        </button>
-      </div>
+     
 
       {/* Blog Header */}
       <header className="max-w-4xl mx-auto px-6 py-8">
@@ -236,27 +300,98 @@ const BlogPost = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => handleLikeDislike("like")}
-              className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold transition transform hover:scale-105 ${
+              className={`flex items-center gap-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all transform hover:scale-110 ${
                 userLiked
-                  ? "bg-green-100 text-green-700"
+                  ? "bg-green-100 text-green-700 shadow-md"
                   : "bg-gray-100 text-gray-400 hover:bg-green-50 hover:text-green-600"
               }`}
             >
-              <ThumbsUp size={16} />
+              {userLiked ? (
+                <FaThumbsUp size={16} />
+              ) : (
+                <ThumbsUp size={16} />
+              )}
               <span>{likes}</span>
             </button>
             <button
               onClick={() => handleLikeDislike("dislike")}
-              className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold transition transform hover:scale-105 ${
+              className={`flex items-center gap-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all transform hover:scale-110 ${
                 userDisliked
-                  ? "bg-red-100 text-red-700"
+                  ? "bg-red-100 text-red-700 shadow-md"
                   : "bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-600"
               }`}
             >
-              <ThumbsDown size={16} />
+              {userDisliked ? (
+                <FaThumbsDown size={16} />
+              ) : (
+                <ThumbsDown size={16} />
+              )}
               <span>{dislikes}</span>
             </button>
           </div>
+        </div>
+      </section>
+
+      {/* Comments Section */}
+      <section className="max-w-4xl mx-auto px-6 py-12 border-b border-zinc-200">
+        <h3 className="text-2xl font-bold mb-6">Comments ({comments.length})</h3>
+        
+        {/* Add Comment Form */}
+        <form onSubmit={handleAddComment} className="mb-8 p-4 bg-zinc-50 rounded-lg">
+          <div className="space-y-3">
+            <input
+              type="text"
+              placeholder="Your name"
+              value={commentAuthor}
+              onChange={(e) => setCommentAuthor(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600"
+            />
+            <textarea
+              placeholder="Share your thoughts..."
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              required
+              maxLength={500}
+              rows={3}
+              className="w-full px-4 py-2 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 resize-none"
+            />
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-zinc-500">{commentText.length}/500</span>
+              <button
+                type="submit"
+                disabled={isLoadingComment || !commentText.trim() || !commentAuthor.trim()}
+                className="bg-green-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 transition disabled:bg-gray-400 cursor-pointer"
+              >
+                {isLoadingComment ? 'Posting...' : 'Post Comment'}
+              </button>
+            </div>
+          </div>
+        </form>
+
+        {/* Comments List */}
+        <div className="space-y-4">
+          {comments.length > 0 ? (
+            comments.map((comment, index) => (
+              <div key={index} className="p-4 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition">
+                <div className="flex items-start justify-between mb-2">
+                  <h4 className="font-semibold text-zinc-900">{comment.author}</h4>
+                  <span className="text-xs text-zinc-500">
+                    {comment.createdAt && new Date(comment.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                </div>
+                <p className="text-sm text-zinc-700 leading-relaxed">{comment.text}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-zinc-500 text-sm text-center py-8">No comments yet. Be the first to comment!</p>
+          )}
         </div>
       </section>
 

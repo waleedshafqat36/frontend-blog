@@ -24,20 +24,26 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     const newComment = {
       _id: new mongoose.Types.ObjectId(),
-      author,
-      text,
+      author: author.trim(),
+      text: text.trim(),
       createdAt: new Date()
     };
 
-    blog.comments = blog.comments || [];
+    if (!blog.comments) {
+      blog.comments = [];
+    }
+
     blog.comments.push(newComment);
-    await blog.save();
+    const savedBlog = await blog.save();
+
+    // Convert to plain object to ensure proper serialization
+    const updatedBlog = await Blog.findById(id).lean();
 
     return NextResponse.json(
       {
         success: true,
         comment: newComment,
-        comments: blog.comments
+        comments: updatedBlog?.comments || []
       },
       { status: 200 }
     );
@@ -56,7 +62,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
     await ConnectDB();
 
-    const blog = await Blog.findById(id);
+    const blog = await Blog.findById(id).lean();
     if (!blog) {
       return NextResponse.json({ message: "Blog not found" }, { status: 404 });
     }

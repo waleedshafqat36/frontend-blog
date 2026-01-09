@@ -9,7 +9,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     
     await ConnectDB();
     
-    const detailsBlog = await Blog.findById(id);
+    const detailsBlog = await Blog.findById(id).lean();
 
     if (!detailsBlog) {
       console.log("Blog not found for ID:", id); // Server console mein check karein

@@ -46,7 +46,7 @@ export default function Navbar() {
           )}
         </div>
 
-        <a href="/auth/login" className="hover:text-white rounded-xl px-3 py-2 bg-green-500">
+        <a href="/auth/login" className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-full text-sm font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
           Log out
         </a>
 
