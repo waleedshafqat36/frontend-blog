@@ -3,6 +3,7 @@ import Blog from "@/models/blog";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 
+
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -18,6 +19,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     await ConnectDB();
 
     const blog = await Blog.findById(id);
+    
     if (!blog) {
       return NextResponse.json({ message: "Blog not found" }, { status: 404 });
     }
@@ -34,7 +36,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
 
     blog.comments.push(newComment);
-    const savedBlog = await blog.save();
+    await blog.save();
 
     // Convert to plain object to ensure proper serialization
     const updatedBlog = await Blog.findById(id).lean();
@@ -76,6 +78,37 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     );
   } catch (error) {
     console.error("Error:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+// Updated code ends here
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+  const { id } = await params;
+  const {commentId, text} = await req.json();
+  console.log("Updating comment:", commentId, text);
+  
+  await ConnectDB();
+
+  const blog = await Blog.findById(id);
+  if (!blog) {
+    return NextResponse.json({ message: "Blog not found" }, { status: 404 });
+  }
+
+  const commentIndex = blog.comments.findIndex((comment: any) => comment._id.toString() === commentId);
+  if (commentIndex === -1) {
+    return NextResponse.json({ message: "Comment not found" }, { status: 404 });
+  }
+
+  blog.comments[commentIndex].text = text;
+  await blog.save();
+
+  return NextResponse.json({ message: "Comment updated successfully" });
+  } catch (error) { 
+    console.error("Error updating comment:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500 }

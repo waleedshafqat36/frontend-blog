@@ -42,14 +42,25 @@ export async function POST(req: Request) {
       user.role = "user";
       await user.save();
     }
+  
 
-    return NextResponse.json(
+    // 5. Successful login response
+    const res= NextResponse.json(
       {
         message: "Login successful",
         user  
       },
       { status: 200 }
     );
+   res.cookies.set("user", 
+    JSON.stringify({id: user._id, name:user.name, role: user.role}),
+     { httpOnly: true, path: '/' });
+
+     res.cookies.set("role", user.role, {
+      httpOnly: true,
+      path: "/",
+    });
+    return res;
 
   } catch (error: any) {
     return NextResponse.json(

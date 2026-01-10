@@ -149,6 +149,35 @@ const AgricultureBlog = () => {
     fetchArticles();
   }, []);
 
+const otherPosts = [
+  { 
+    id: 1, 
+    title: "Kapas ki munasib kash aur beej ka intekhab", 
+    img: "https://images.unsplash.com/photo-1594904351111-a072f80b1a71?q=80&w=200" 
+  },
+  { 
+    id: 2, 
+    title: "Jadeed kisaan: Tunnel farming se munafa kaise kamayein?", 
+    img: "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?q=80&w=200" 
+  },
+  { 
+    id: 3, 
+    title: "Sardiyon mein sabziyon ki dekh bhaal ke aham mashwaray", 
+    img: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?q=80&w=200" 
+  },
+  { 
+    id: 4, 
+    title: "Khadon ka mutawazin istemal aur zameen ki zarkhezi", 
+    img: "https://images.unsplash.com/photo-1560493676-04071c5f467b?q=80&w=200" 
+  },
+  { 
+    id: 5, 
+    title: "Dhaan ki fasal ko bimariyon se bachane ka tariqa", 
+    img: "https://images.unsplash.com/photo-1530507629858-e4977d30e9e0?q=80&w=400" 
+  },
+
+];;
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-green-50 to-white font-sans text-zinc-900">
@@ -258,28 +287,62 @@ const AgricultureBlog = () => {
       </nav>
 
       {/* --- HERO SECTION --- */}
-      <header className="max-w-7xl mx-auto px-8 md:px-16 py-12 grid md:grid-cols-2 gap-12 items-center">
-        <div className="animate-slideInLeft">
-          <h1 className="text-5xl font-bold mb-6 leading-tight bg-gradient-to-r from-green-700 via-green-600 to-green-500 bg-clip-text text-transparent animate-fadeInUp">
-            Sustainable Future <br /> Insights
-          </h1>
-          <p className="text-zinc-500 text-sm max-w-sm mb-4 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-            We share common trends and strategies for improving your understanding and in high demand of science unique trends sources from around the world.
-          </p>
-          <a href="#" className="text-green-600 text-sm font-bold flex items-center gap-2 hover:gap-4 transition-all duration-300 group animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
-            Learn More <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
-          </a>
+    
+    <div className="max-w-7xl mx-auto px-4 py-10 font-sans">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+        
+        {/* Left Side: Main Featured Post */}
+    <div className="lg:col-span-2 relative group cursor-pointer overflow-hidden rounded-2xl h-[450px]">
+  {/* Agriculture Image */}
+  <img 
+    src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?q=80&w=1200" 
+    alt="Gandum ki Kasht" 
+    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+  />
+  
+  {/* Dark Overlay with Gradient */}
+  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-8">
+    
+    {/* Category Tag */}
+    <span className="bg-green-600/40 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full w-fit mb-4 border border-green-400/30">
+      Agriculture
+    </span>
+    
+    {/* Title */}
+    <h1 className="text-white text-3xl md:text-4xl font-bold leading-tight max-w-lg">
+      Gandum ki Bumper Paidawar: Jadeed Zarai Tareeqay aur Dekh Bhaal
+    </h1>
+    
+    {/* Optional: Chota sa description ya date */}
+    <p className="text-gray-300 text-sm mt-3">
+      Dr. Zahid • January 9, 2026
+    </p>
+  </div>
+</div>
+
+        {/* Right Side: Other Featured Posts */}
+        <div className="flex flex-col gap-6">
+          <h2 className="text-xl font-bold text-gray-900 border-b pb-2">Other featured posts</h2>
+          <div className="flex flex-col gap-5">
+            {otherPosts.map((post) => (
+              <div key={post.id} className="flex gap-4 items-center group cursor-pointer">
+                <div className="flex-shrink-0 w-24 h-16 overflow-hidden rounded-xl">
+                  <img 
+                    src={post.img} 
+                    alt={post.title} 
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
+                </div>
+                <h3 className="text-sm font-semibold text-gray-800 leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
+                  {post.title}
+                </h3>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="relative animate-slideInRight">
-          <div className="absolute -inset-2 bg-gradient-to-r from-green-400 to-green-600 rounded-3xl opacity-20 blur-xl animate-float"></div>
-          <img 
-            src="https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=1000" 
-            alt="Farming rows" 
-            className="rounded-3xl shadow-2xl w-full h-96 object-cover relative hover:shadow-3xl transition-all duration-500"
-          />
-          <Leaf className="absolute top-8 right-8 text-green-500 animate-leafFloat" size={40} />
-        </div>
-      </header>
+
+      </div>
+    </div>
 
       {/* --- TRENDING ARTICLES --- */}
       <section className="max-w-7xl mx-auto px-8 md:px-16 py-16">

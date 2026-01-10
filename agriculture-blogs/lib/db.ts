@@ -18,7 +18,7 @@ if (!cached.promise) {
       maxPoolSize: 10,
     };
 
-    cached.promise =  mongoose.connect(MONGO_URI,opts)
+    cached.promise =  mongoose.connect(MONGO_URI!, opts)
       .then((mongoose) => {
         console.log("✅ MongoDB connected successfully"); // <-- Connection success log
         return mongoose.connection;

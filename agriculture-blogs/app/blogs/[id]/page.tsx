@@ -4,7 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, Facebook, Twitter, Instagram, Linkedin, ThumbsUp, ThumbsDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FaFacebook, FaLinkedin, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
-import { BsInstagram, BsTwitter } from "react-icons/bs";
+import { BsInstagram, BsTwitter, BsWhatsapp } from "react-icons/bs";
 
 interface Blog {
   _id: string;
@@ -47,6 +47,9 @@ const BlogPost = () => {
   const [commentText, setCommentText] = useState("");
   const [commentAuthor, setCommentAuthor] = useState("");
   const [isLoadingComment, setIsLoadingComment] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+const [editAuthor, setEditAuthor] = useState("");
+const [editText, setEditText] = useState("");
   const params = useParams();
   const blogId = params.id as string | string[] | undefined;
 
@@ -177,7 +180,49 @@ const BlogPost = () => {
       setIsLoadingComment(false);
     }
   };
-
+  const handleEditComment = (id: string, author: string, text: string) => {
+  setEditingCommentId(id);
+  setEditAuthor(author);
+  setEditText(text);
+};
+const handleCancelEdit = () => {
+  setEditingCommentId(null);
+  setEditAuthor("");
+  setEditText("");
+};
+  const handleEditComments = async () => {
+     if (!editAuthor.trim() || !editText.trim()) return;
+    try {
+      const response = await fetch(`/api/blog/${blogId}/comment`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+           commentId: editingCommentId,
+        author: editAuthor,
+        text: editText
+       }),
+      }); 
+      
+      
+      if (response.ok) {
+        const data = await response.json();
+        setComments(prev =>
+        prev.map(c =>
+          c._id === editingCommentId
+            ? { ...c, author: editAuthor, text: editText }
+            : c
+        ));
+        handleCancelEdit();
+      } else {
+        console.error("Failed to update comment");
+      }
+    } catch (error) {
+      console.error("Error updating comment:", error);
+    }
+  }; 
+   
   const handleLogout = () => {
     localStorage.removeItem('user');
     router.push('/auth/login');
@@ -288,10 +333,94 @@ const BlogPost = () => {
       {/* Blog Content */}
       <article className="max-w-4xl mx-auto px-6 py-12">
         <div
-          className="prose prose-lg max-w-none text-zinc-700 leading-relaxed"
+          className="prose prose-lg max-w-none text-gray-700 leading-relaxed text-lg"
           dangerouslySetInnerHTML={{ __html: blog?.content || '' }}
         />
       </article>
+      <div className="max-w-4xl mx-auto px-6 py-10 bg-white shadow-sm rounded-3xl border border-gray-100">
+  {/* Introduction Section */}
+  <section className="mb-10">
+    <h2 className="text-3xl font-extrabold text-gray-900 mb-4 border-l-4 border-green-600 pl-4">
+      Gandum ki Bumper Paidawar: Aik Mukammal Guide
+    </h2>
+    <p className="text-gray-700 leading-relaxed text-lg">
+      Agriculture hamari maishat ka satoon hai. Gandum ki behtar paidawar hasil karne ke liye kisaan ko jadeed tareeqon aur waqt ki pabandi ka khayal rakhna parta hai. Is article mein hum un aham marhalaat ka zikr karenge jo aapki fasal ko kamyab bana sakte hain.
+    </p>
+  </section>
+
+  {/* Main Steps Section - List with Icons/Numbers */}
+  <section className="mb-10">
+    <h3 className="text-2xl font-bold text-gray-800 mb-6">Zameen ki Tayari ke Aham Marahil</h3>
+    <div className="space-y-6">
+      <div className="flex gap-4">
+        <div className="flex-shrink-0 w-8 h-8 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold">1</div>
+        <div>
+          <h4 className="text-xl font-semibold text-gray-900">Humwar Zameen</h4>
+          <p className="text-gray-600 mt-1">
+            Zameen ka hamwar hona pani ki barabar taqseem ke liye nihayat zaroori hai. Is ke liye laser land leveler ka istemal behtreen hai.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex gap-4">
+        <div className="flex-shrink-0 w-8 h-8 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold">2</div>
+        <div>
+          <h4 className="text-xl font-semibold text-gray-900">Munasib Hal-Chalana</h4>
+          <p className="text-gray-600 mt-1">
+            Kasht se pehle do se teen martaba gehra hal chala kar mitti ko naram karlein taake beej ki jarein asani se phail sakein.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Bullet Point List Section */}
+  <section className="bg-green-50 p-8 rounded-2xl border border-green-100 mb-10">
+    <h3 className="text-2xl font-bold text-green-900 mb-4">Beej ki Khususiyaat</h3>
+    <ul className="grid md:grid-cols-2 gap-4">
+      <li className="flex items-center gap-2 text-gray-700 font-medium">
+        <span className="w-2 h-2 bg-green-600 rounded-full"></span> Tasdiq shuda beej ka intekhab
+      </li>
+      <li className="flex items-center gap-2 text-gray-700 font-medium">
+        <span className="w-2 h-2 bg-green-600 rounded-full"></span> Sharah-beej: 40-50 kg fi ekarr
+      </li>
+      <li className="flex items-center gap-2 text-gray-700 font-medium">
+        <span className="w-2 h-2 bg-green-600 rounded-full"></span> Tehreer karda expirey date check karein
+      </li>
+      <li className="flex items-center gap-2 text-gray-700 font-medium">
+        <span className="w-2 h-2 bg-green-600 rounded-full"></span> Bimariyon se pak aur saaf beej
+      </li>
+    </ul>
+  </section>
+
+  {/* Fertilizer/Khad Section */}
+  <section>
+    <h3 className="text-2xl font-bold text-gray-800 mb-4">Khad aur Pani ka Schedule</h3>
+    <p className="text-gray-700 mb-6">
+      Khadon ka munasib waqt par istemal hi paidawar mein izafay ka sabab banta hai. Pehla pani hamesha kasht ke 20-22 din baad lagana chahiye jab fasal shofay (tillering) nikal rahi ho.
+    </p>
+    <div className="overflow-hidden border border-gray-200 rounded-xl">
+      <table className="w-full text-left text-sm">
+        <thead className="bg-gray-100 text-gray-700 font-bold">
+          <tr>
+            <th className="px-4 py-3">Marhala</th>
+            <th className="px-4 py-3">Khad ki Miqdar</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200">
+          <tr>
+            <td className="px-4 py-3 font-medium">Waqt-e-Kasht</td>
+            <td className="px-4 py-3">1 Bori DAP + 1 Bori SOP</td>
+          </tr>
+          <tr>
+            <td className="px-4 py-3 font-medium">Pehla Pani</td>
+            <td className="px-4 py-3">1 Bori Urea</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
 
       {/* Like/Dislike Section */}
       <section className="max-w-4xl mx-auto px-6 py-8 border-b border-zinc-200">
@@ -371,48 +500,119 @@ const BlogPost = () => {
 
         {/* Comments List */}
         <div className="space-y-4">
-          {comments.length > 0 ? (
-            comments.map((comment, index) => (
-              <div key={index} className="p-4 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition">
-                <div className="flex items-start justify-between mb-2">
-                  <h4 className="font-semibold text-zinc-900">{comment.author}</h4>
-                  <span className="text-xs text-zinc-500">
-                    {comment.createdAt && new Date(comment.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </span>
-                </div>
-                <p className="text-sm text-zinc-700 leading-relaxed">{comment.text}</p>
-              </div>
-            ))
-          ) : (
-            <p className="text-zinc-500 text-sm text-center py-8">No comments yet. Be the first to comment!</p>
-          )}
-        </div>
+  {comments.length > 0 ? (
+    comments.map((comment) => (
+      <div key={comment._id} className="p-4 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition">
+        {editingCommentId === comment._id ? (
+          // ✨ Editable form
+          <div className="space-y-2">
+            <input
+              type="text"
+              value={editAuthor}
+              onChange={(e) => setEditAuthor(e.target.value)}
+              className="w-full px-3 py-2 border border-zinc-300 rounded-md"
+            />
+            <textarea
+              rows={3}
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              className="w-full px-3 py-2 border border-zinc-300 rounded-md resize-none"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={handleEditComments}
+                className="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700"
+              >
+                Save
+              </button>
+              <button
+                onClick={handleCancelEdit}
+                className="bg-gray-200 text-gray-700 px-4 py-1 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          // ✨ Normal display
+          <>
+            <div className="flex items-start justify-between mb-2">
+              <h4 className="font-semibold text-zinc-900">{comment.author}</h4>
+              <span className="text-xs text-zinc-500">
+                {comment.createdAt && new Date(comment.createdAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </span>
+            </div>
+            <p className="text-sm text-zinc-700 leading-relaxed">{comment.text}</p>
+            <button
+              className="mt-2 px-3 py-2 text-white cursor-pointer rounded-xl bg-green-600 hover:text-white hover:bg-green-700 transition"
+              onClick={() => handleEditComment(comment._id, comment.author, comment.text)}
+            >
+              Edit
+            </button>
+          </>
+        )}
+      </div>
+    ))
+  ) : (
+    <p className="text-zinc-500 text-sm text-center py-8">
+      No comments yet. Be the first to comment!
+    </p>
+  )}
+</div>
+
       </section>
 
       {/* Share Section */}
       <section className="max-w-4xl mx-auto px-6 py-12 border-b border-zinc-200 mt-0">
-        <h3 className="text-xl font-bold mb-6">Share This Article</h3>
-        <div className="flex gap-4">
-          <button className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition">
-            <FaFacebook size={20} />
-          </button>
-          <button className="w-12 h-12 bg-sky-500 text-white rounded-full flex items-center justify-center hover:bg-sky-600 transition">
-            <BsTwitter size={20} />
-          </button>
-          <button className="w-12 h-12 bg-pink-600 text-white rounded-full flex items-center justify-center hover:bg-pink-700 transition">
-            <BsInstagram size={20} />
-          </button>
-          <button className="w-12 h-12 bg-blue-700 text-white rounded-full flex items-center justify-center hover:bg-blue-800 transition">
-            <FaLinkedin size={20} />
-          </button>
-        </div>
-      </section>
+  <h3 className="text-xl font-bold mb-6">Share This Article</h3>
+  <div className="flex gap-4">
+    {/* Facebook */}
+    <a 
+      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition"
+    >
+      <FaFacebook size={20} />
+    </a>
+
+    {/* Twitter (X) */}
+    <a 
+      href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(blog.title)}`} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="w-12 h-12 bg-sky-500 text-white rounded-full flex items-center justify-center hover:bg-sky-600 transition"
+    >
+      <BsTwitter size={20} />
+    </a>
+
+    {/* LinkedIn */}
+    <a 
+      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="w-12 h-12 bg-blue-700 text-white rounded-full flex items-center justify-center hover:bg-blue-800 transition"
+    >
+      <FaLinkedin size={20} />
+    </a>
+
+    {/* WhatsApp (Instagram direct sharing web se possible nahi hai, isliye WhatsApp behtar hai) */}
+    <a 
+      href={`https://wa.me/?text=${encodeURIComponent(blog.title + " " + window.location.href)}`} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center hover:bg-green-600 transition"
+    >
+      <BsWhatsapp size={20} />
+    </a>
+  </div>
+</section>
 
       {/* Related Articles Section */}
      {/* Related Articles Section - Updated Logic */}
