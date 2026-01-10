@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const { author, text } = await req.json();
+    const { author, text, authorId } = await req.json();
 
     if (!author || !text) {
       return NextResponse.json(
@@ -27,6 +27,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const newComment = {
       _id: new mongoose.Types.ObjectId(),
       author: author.trim(),
+      authorId: authorId || null,
       text: text.trim(),
       createdAt: new Date()
     };
@@ -109,6 +110,52 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   return NextResponse.json({ message: "Comment updated successfully" });
   } catch (error) { 
     console.error("Error updating comment:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const { commentId } = await req.json();
+
+    if (!commentId) {
+      return NextResponse.json(
+        { message: "Comment ID is required" },
+        { status: 400 }
+      );
+    }
+
+    await ConnectDB();
+
+    const blog = await Blog.findById(id);
+    if (!blog) {
+      return NextResponse.json({ message: "Blog not found" }, { status: 404 });
+    }
+
+    const commentIndex = blog.comments.findIndex((comment: any) => comment._id.toString() === commentId);
+    if (commentIndex === -1) {
+      return NextResponse.json({ message: "Comment not found" }, { status: 404 });
+    }
+
+    blog.comments.splice(commentIndex, 1);
+    await blog.save();
+
+    const updatedBlog = await Blog.findById(id).lean();
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Comment deleted successfully",
+        comments: updatedBlog?.comments || []
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting comment:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500 }

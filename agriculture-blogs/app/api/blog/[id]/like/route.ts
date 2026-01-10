@@ -72,7 +72,18 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
 
     // Execute the update with $inc operator
-    const updatedBlog = await Blog.findByIdAndUpdate(id, updateQuery, { new: true });
+    let updatedBlog = await Blog.findByIdAndUpdate(id, updateQuery, { new: true });
+
+    // Ensure counts never go below 0
+    if (updatedBlog) {
+      if (!updatedBlog.likeCount || updatedBlog.likeCount < 0) {
+        updatedBlog.likeCount = 0;
+      }
+      if (!updatedBlog.dislikeCount || updatedBlog.dislikeCount < 0) {
+        updatedBlog.dislikeCount = 0;
+      }
+      await updatedBlog.save();
+    }
 
     return NextResponse.json(
       {
