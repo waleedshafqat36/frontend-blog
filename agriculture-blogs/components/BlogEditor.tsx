@@ -2,7 +2,36 @@
 
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import { useEffect } from 'react'
+import Link from '@tiptap/extension-link'
+import Image from '@tiptap/extension-image'
+import { useEffect, useRef, useState } from 'react'
+import {
+  Bold,
+  Italic,
+  List,
+  ListOrdered,
+  Heading2,
+  Heading3,
+  Link as LinkIcon,
+  Image as ImageIcon,
+  Code,
+  Quote,
+  Unlink,
+} from 'lucide-react'
+import dynamic from 'next/dynamic'
+
+const ImageUploadButton = dynamic(() => import('./ImageUploadButton'), {
+  ssr: false,
+  loading: () => (
+    <button
+      disabled
+      title="Add Image (Loading...)"
+      className="p-2 rounded-lg text-slate-400 cursor-not-allowed"
+    >
+      <ImageIcon size={18} />
+    </button>
+  ),
+})
 
 type Props = {
   value: string
@@ -10,15 +39,44 @@ type Props = {
 }
 
 export default function BlogEditor({ value, onChange }: Props) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [showLinkInput, setShowLinkInput] = useState(false)
+  const [linkUrl, setLinkUrl] = useState('')
+
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit.configure({
+        heading: {
+          levels: [2, 3],
+        },
+        codeBlock: {
+          languageClassPrefix: 'language-',
+        },
+      }),
+      Link.configure({
+        openOnClick: false,
+        autolink: true,
+        linkOnPaste: true,
+        HTMLAttributes: {
+          class: 'text-blue-500 underline cursor-pointer hover:text-blue-600',
+          rel: 'noopener noreferrer',
+          target: '_blank',
+        },
+      }),
+      Image.configure({
+        allowBase64: true,
+        HTMLAttributes: {
+          class: 'max-w-full h-auto rounded-lg',
+        },
+      }),
+    ],
     content: value,
     onUpdate({ editor }) {
       onChange(editor.getHTML())
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none',
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none min-h-[300px] w-full [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:my-4 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:my-3',
       },
     },
     immediatelyRender: false,
@@ -30,9 +88,217 @@ export default function BlogEditor({ value, onChange }: Props) {
     }
   }, [value, editor])
 
+  const handleAddImage = (url: string) => {
+    if (editor) {
+      editor.chain().focus().setImage({ src: url }).run()
+    }
+  }
+
+  const handleAddLink = () => {
+    const text = editor?.state.selection.$from.parent.textContent || ''
+    const selectedText = editor?.state.doc.textBetween(
+      editor.state.selection.$from.pos,
+      editor.state.selection.$to.pos,
+      ' '
+    ) || ''
+
+    if (!selectedText && !text) {
+      alert('Please select some text first, or type text and then add a link.')
+      return
+    }
+
+    setShowLinkInput(true)
+    setLinkUrl('')
+  }
+
+  const confirmLink = () => {
+    if (!linkUrl) {
+      alert('Please enter a URL')
+      return
+    }
+
+    let url = linkUrl
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url
+    }
+
+    if (editor) {
+      editor
+        .chain()
+        .focus()
+        .extendMarkRange('link')
+        .setLink({ href: url, target: '_blank' })
+        .run()
+    }
+
+    setShowLinkInput(false)
+    setLinkUrl('')
+  }
+
+  const removeLink = () => {
+    if (editor) {
+      editor.chain().focus().unsetLink().run()
+    }
+  }
+
+  const toggleBold = () => editor?.chain().focus().toggleBold().run()
+  const toggleItalic = () => editor?.chain().focus().toggleItalic().run()
+  const toggleCode = () => editor?.chain().focus().toggleCode().run()
+  const toggleBulletList = () => editor?.chain().focus().toggleBulletList().run()
+  const toggleOrderedList = () => editor?.chain().focus().toggleOrderedList().run()
+  const toggleHeading2 = () => editor?.chain().focus().toggleHeading({ level: 2 }).run()
+  const toggleHeading3 = () => editor?.chain().focus().toggleHeading({ level: 3 }).run()
+  const toggleBlockquote = () => editor?.chain().focus().toggleBlockquote().run()
+
+  const ToolbarButton = ({
+    onClick,
+    icon: Icon,
+    title,
+    isActive = false,
+  }: {
+    onClick: () => void
+    icon: React.ComponentType<{ size: number }>
+    title: string
+    isActive?: boolean
+  }) => (
+    <button
+      onClick={(e) => {
+        e.preventDefault()
+        onClick()
+      }}
+      title={title}
+      className={`p-2 rounded-lg transition-colors ${
+        isActive
+          ? 'bg-green-500 text-white'
+          : 'hover:bg-slate-200 text-slate-600'
+      }`}
+    >
+      <Icon size={18} />
+    </button>
+  )
+
+  if (!editor) {
+    return <div className="p-4 text-slate-400">Loading editor...</div>
+  }
+
   return (
-    <div className="border border-slate-200 rounded-2xl bg-slate-50 p-4 min-h-[200px] focus-within:border-green-500">
-      {editor ? <EditorContent editor={editor} /> : null}
+    <div className="border border-slate-200 rounded-2xl bg-slate-50 overflow-hidden focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-200">
+      {/* TOOLBAR */}
+      <div className="bg-white border-b border-slate-200 p-3 flex flex-wrap gap-2 items-center">
+        <ToolbarButton
+          onClick={toggleBold}
+          icon={Bold}
+          title="Bold"
+          isActive={editor.isActive('bold')}
+        />
+        <ToolbarButton
+          onClick={toggleItalic}
+          icon={Italic}
+          title="Italic"
+          isActive={editor.isActive('italic')}
+        />
+        <ToolbarButton
+          onClick={toggleCode}
+          icon={Code}
+          title="Code"
+          isActive={editor.isActive('code')}
+        />
+
+        <div className="w-px h-6 bg-slate-200" />
+
+        <ToolbarButton
+          onClick={toggleHeading2}
+          icon={Heading2}
+          title="Heading 2"
+          isActive={editor.isActive('heading', { level: 2 })}
+        />
+        <ToolbarButton
+          onClick={toggleHeading3}
+          icon={Heading3}
+          title="Heading 3"
+          isActive={editor.isActive('heading', { level: 3 })}
+        />
+
+        <div className="w-px h-6 bg-slate-200" />
+
+        <ToolbarButton
+          onClick={toggleBulletList}
+          icon={List}
+          title="Bullet List"
+          isActive={editor.isActive('bulletList')}
+        />
+        <ToolbarButton
+          onClick={toggleOrderedList}
+          icon={ListOrdered}
+          title="Ordered List"
+          isActive={editor.isActive('orderedList')}
+        />
+
+        <ToolbarButton
+          onClick={toggleBlockquote}
+          icon={Quote}
+          title="Quote"
+          isActive={editor.isActive('blockquote')}
+        />
+
+        <div className="w-px h-6 bg-slate-200" />
+
+        <div className="flex items-center gap-1">
+          <ToolbarButton
+            onClick={handleAddLink}
+            icon={LinkIcon}
+            title="Add Link (select text first)"
+            isActive={editor.isActive('link')}
+          />
+          
+          {editor.isActive('link') && (
+            <ToolbarButton
+              onClick={removeLink}
+              icon={Unlink}
+              title="Remove Link"
+              isActive={false}
+            />
+          )}
+        </div>
+
+        {showLinkInput && (
+          <div className="flex gap-1 items-center bg-slate-100 p-2 rounded">
+            <input
+              type="text"
+              placeholder="Enter URL (e.g., example.com)"
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') confirmLink()
+              }}
+              autoFocus
+              className="px-2 py-1 rounded border border-slate-300 text-sm w-48 focus:outline-none focus:border-green-500"
+            />
+            <button
+              onClick={confirmLink}
+              className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-sm font-medium whitespace-nowrap"
+            >
+              Add
+            </button>
+            <button
+              onClick={() => {
+                setShowLinkInput(false)
+                setLinkUrl('')
+              }}
+              className="px-3 py-1 bg-slate-300 hover:bg-slate-400 text-slate-700 rounded text-sm font-medium whitespace-nowrap"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+
+        <ImageUploadButton onImageUpload={handleAddImage} />
+      </div>
+
+      {/* EDITOR */}
+      <div className="p-6 bg-white">
+        <EditorContent editor={editor} />
+      </div>
     </div>
   )
 }

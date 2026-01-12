@@ -481,94 +481,20 @@ const handleCancelEdit = () => {
       {/* Blog Content */}
       <article className="max-w-4xl mx-auto px-6 py-12">
         <div
-          className="prose prose-lg max-w-none text-gray-700 leading-relaxed text-lg"
+          className="prose prose-lg max-w-none text-gray-700 leading-relaxed text-lg
+          prose-h2:text-3xl prose-h2:font-bold prose-h2:text-gray-900 prose-h2:mt-6 prose-h2:mb-4
+          prose-h3:text-2xl prose-h3:font-bold prose-h3:text-gray-800 prose-h3:mt-4 prose-h3:mb-3
+          prose-p:text-base prose-p:leading-7
+          prose-strong:font-bold prose-strong:text-gray-900
+          prose-em:italic
+          prose-blockquote:border-l-4 prose-blockquote:border-green-500 prose-blockquote:text-gray-700 prose-blockquote:italic
+          prose-ul:list-disc prose-ol:list-decimal
+          prose-li:text-base
+          prose-a:text-blue-600 prose-a:underline hover:prose-a:text-blue-800
+          prose-img:rounded-lg prose-img:shadow-md"
           dangerouslySetInnerHTML={{ __html: blog?.content || '' }}
         />
       </article>
-      <div className="max-w-4xl mx-auto px-6 py-10 bg-white shadow-sm rounded-3xl border border-gray-100">
-  {/* Introduction Section */}
-  <section className="mb-10">
-    <h2 className="text-3xl font-extrabold text-gray-900 mb-4 border-l-4 border-green-600 pl-4">
-      Gandum ki Bumper Paidawar: Aik Mukammal Guide
-    </h2>
-    <p className="text-gray-700 leading-relaxed text-lg">
-      Agriculture hamari maishat ka satoon hai. Gandum ki behtar paidawar hasil karne ke liye kisaan ko jadeed tareeqon aur waqt ki pabandi ka khayal rakhna parta hai. Is article mein hum un aham marhalaat ka zikr karenge jo aapki fasal ko kamyab bana sakte hain.
-    </p>
-  </section>
-
-  {/* Main Steps Section - List with Icons/Numbers */}
-  <section className="mb-10">
-    <h3 className="text-2xl font-bold text-gray-800 mb-6">Zameen ki Tayari ke Aham Marahil</h3>
-    <div className="space-y-6">
-      <div className="flex gap-4">
-        <div className="flex-shrink-0 w-8 h-8 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold">1</div>
-        <div>
-          <h4 className="text-xl font-semibold text-gray-900">Humwar Zameen</h4>
-          <p className="text-gray-600 mt-1">
-            Zameen ka hamwar hona pani ki barabar taqseem ke liye nihayat zaroori hai. Is ke liye laser land leveler ka istemal behtreen hai.
-          </p>
-        </div>
-      </div>
-
-      <div className="flex gap-4">
-        <div className="flex-shrink-0 w-8 h-8 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold">2</div>
-        <div>
-          <h4 className="text-xl font-semibold text-gray-900">Munasib Hal-Chalana</h4>
-          <p className="text-gray-600 mt-1">
-            Kasht se pehle do se teen martaba gehra hal chala kar mitti ko naram karlein taake beej ki jarein asani se phail sakein.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {/* Bullet Point List Section */}
-  <section className="bg-green-50 p-8 rounded-2xl border border-green-100 mb-10">
-    <h3 className="text-2xl font-bold text-green-900 mb-4">Beej ki Khususiyaat</h3>
-    <ul className="grid md:grid-cols-2 gap-4">
-      <li className="flex items-center gap-2 text-gray-700 font-medium">
-        <span className="w-2 h-2 bg-green-600 rounded-full"></span> Tasdiq shuda beej ka intekhab
-      </li>
-      <li className="flex items-center gap-2 text-gray-700 font-medium">
-        <span className="w-2 h-2 bg-green-600 rounded-full"></span> Sharah-beej: 40-50 kg fi ekarr
-      </li>
-      <li className="flex items-center gap-2 text-gray-700 font-medium">
-        <span className="w-2 h-2 bg-green-600 rounded-full"></span> Tehreer karda expirey date check karein
-      </li>
-      <li className="flex items-center gap-2 text-gray-700 font-medium">
-        <span className="w-2 h-2 bg-green-600 rounded-full"></span> Bimariyon se pak aur saaf beej
-      </li>
-    </ul>
-  </section>
-
-  {/* Fertilizer/Khad Section */}
-  <section>
-    <h3 className="text-2xl font-bold text-gray-800 mb-4">Khad aur Pani ka Schedule</h3>
-    <p className="text-gray-700 mb-6">
-      Khadon ka munasib waqt par istemal hi paidawar mein izafay ka sabab banta hai. Pehla pani hamesha kasht ke 20-22 din baad lagana chahiye jab fasal shofay (tillering) nikal rahi ho.
-    </p>
-    <div className="overflow-hidden border border-gray-200 rounded-xl">
-      <table className="w-full text-left text-sm">
-        <thead className="bg-gray-100 text-gray-700 font-bold">
-          <tr>
-            <th className="px-4 py-3">Marhala</th>
-            <th className="px-4 py-3">Khad ki Miqdar</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          <tr>
-            <td className="px-4 py-3 font-medium">Waqt-e-Kasht</td>
-            <td className="px-4 py-3">1 Bori DAP + 1 Bori SOP</td>
-          </tr>
-          <tr>
-            <td className="px-4 py-3 font-medium">Pehla Pani</td>
-            <td className="px-4 py-3">1 Bori Urea</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-</div>
 
       {/* Like/Dislike Section */}
       <section className="max-w-4xl mx-auto px-6 py-8 border-b border-zinc-200 animate-fadeInUp" style={{animationDelay: "0.4s"}}>
