@@ -35,8 +35,10 @@ const AgricultureBlog = () => {
 
   const truncateContent = (content: string, maxLength: number = 100) => {
     if (!content) return '';
-    if (content.length <= maxLength) return content;
-    return content.substring(0, maxLength) + '...';
+    // Remove HTML tags
+    const plainText = content.replace(/<[^>]*>/g, '');
+    if (plainText.length <= maxLength) return plainText;
+    return plainText.substring(0, maxLength) + '...';
   };
 
   const handleLike = async (articleId: string, e: React.MouseEvent) => {
@@ -227,6 +229,44 @@ const otherPosts = [
             transform: translateY(0);
           }
         }
+        /* Agriculture-themed animations */
+        @keyframes leafSway {
+          0%, 100% { transform: rotate(-2deg) translateY(0px); }
+          25% { transform: rotate(2deg) translateY(-3px); }
+          50% { transform: rotate(0deg) translateY(0px); }
+          75% { transform: rotate(-2deg) translateY(-2px); }
+        }
+        @keyframes sprout {
+          0% {
+            opacity: 0;
+            transform: scaleY(0) translateY(20px);
+          }
+          50% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 1;
+            transform: scaleY(1) translateY(0);
+          }
+        }
+        @keyframes grow {
+          0% {
+            transform: scaleY(0.3);
+            opacity: 0;
+          }
+          100% {
+            transform: scaleY(1);
+            opacity: 1;
+          }
+        }
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.8; }
+        }
         @keyframes shimmer {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.7; }
@@ -235,13 +275,75 @@ const otherPosts = [
           0%, 100% { transform: translateY(0px) rotate(0deg); }
           50% { transform: translateY(-15px) rotate(5deg); }
         }
+        @keyframes glow {
+          0%, 100% { 
+            box-shadow: 0 0 5px rgba(34, 197, 94, 0.3);
+          }
+          50% { 
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+          }
+        }
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes cardHover {
+          0% {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+          }
+          50% {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.2);
+          }
+          100% {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+          }
+        }
+        @keyframes ripple {
+          0% {
+            transform: scale(0);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(4);
+            opacity: 0;
+          }
+        }
+        @keyframes fieldWave {
+          0%, 100% { transform: translateX(0) skewY(0deg); }
+          25% { transform: translateX(5px) skewY(1deg); }
+          50% { transform: translateX(10px) skewY(0deg); }
+          75% { transform: translateX(5px) skewY(-1deg); }
+        }
+        
         .animate-float { animation: float 3s ease-in-out infinite; }
         .animate-slideInLeft { animation: slideInLeft 0.6s ease-out; }
         .animate-slideInRight { animation: slideInRight 0.6s ease-out; }
         .animate-scaleIn { animation: scaleIn 0.5s ease-out; }
         .animate-fadeInUp { animation: fadeInUp 0.6s ease-out; }
         .animate-leafFloat { animation: leafFloat 4s ease-in-out infinite; }
-        .card-loader { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
+        .animate-leafSway { animation: leafSway 3s ease-in-out infinite; }
+        .animate-sprout { animation: sprout 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .animate-grow { animation: grow 0.8s ease-out; }
+        .animate-bounce-subtle { animation: bounce 2s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulse 2s ease-in-out infinite; }
+        .animate-glow { animation: glow 3s ease-in-out infinite; }
+        .animate-slideUp { animation: slideUp 0.7s ease-out; }
+        .animate-fieldWave { animation: fieldWave 4s ease-in-out infinite; }
+        .card-loader { animation: slideUp 0.6s ease-out forwards; opacity: 0; }
+        
+        /* Hover effects */
+        .card-hover:hover {
+          animation: none;
+        }
       `}</style>
 
       {/* --- NAVBAR --- */}
@@ -347,9 +449,11 @@ const otherPosts = [
       {/* --- TRENDING ARTICLES --- */}
       <section className="max-w-7xl mx-auto px-8 md:px-16 py-16">
         <div className="mb-12 animate-fadeInUp">
-          <h2 className="text-4xl font-bold mb-2 bg-gradient-to-r from-green-700 to-green-600 bg-clip-text text-transparent">Our Trending Articles</h2>
-          <div className="h-1 w-20 bg-gradient-to-r from-green-600 to-green-400 rounded-full"></div>
-          <p className="text-zinc-500 text-sm mt-4 max-w-2xl">
+          <h2 className="text-4xl font-bold mb-2 bg-gradient-to-r from-green-700 to-green-600 bg-clip-text text-transparent animate-slideUp hover:scale-105 transition-transform duration-300 inline-block">
+            Our Trending Articles
+          </h2>
+          <div className="h-1 w-20 bg-gradient-to-r from-green-600 to-green-400 rounded-full animate-grow"></div>
+          <p className="text-zinc-500 text-sm mt-4 max-w-2xl animate-slideUp" style={{animationDelay: '0.2s'}}>
             Discover the latest insights and trends in sustainable agriculture. Explore expert articles on farming, agri-tech, and organic solutions.
           </p>
         </div>
@@ -358,51 +462,68 @@ const otherPosts = [
           {articles.map((article, index) => (
             <div 
               key={index} 
-              className="group cursor-pointer card-loader px-3 py-2 rounded-lg hover:bg-green-50/30 transition-colors duration-300"
+              className="group cursor-pointer card-loader px-3 py-2 rounded-2xl hover:bg-green-50/50 transition-all duration-300 relative"
               style={{
-                animation: loadedCards.has(article._id) ? 'fadeInUp 0.6s ease-out forwards' : 'none',
+                animation: loadedCards.has(article._id) ? 'slideUp 0.6s ease-out forwards' : 'none',
                 animationDelay: loadedCards.has(article._id) ? `${index * 0.1}s` : '0s'
               }}
             >
-              <div className="overflow-hidden rounded-2xl mb-4 relative cursor-pointer group/image" onClick={() => router.push(`/blogs/${article?._id}`)}>
-                <div className="absolute inset-0 bg-gradient-to-br from-green-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
-                <img 
-                  src={article?.image || ''} 
-                  alt="Agriculture" 
-                  className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-700 ease-out cursor-pointer"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 rounded-2xl"></div>
-                <div className="absolute top-3 right-3 bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-105">Featured</div>
-              </div>
-              <h3 className="font-bold text-lg mb-2 leading-tight text-zinc-900 group-hover:text-green-600 transition-colors duration-300">
-                {article?.title}
-              </h3>
-              <p className="text-zinc-500 text-xs mb-4 leading-relaxed">
-                {truncateContent(article?.content || '', 100)}
-              </p>
-              <div className="flex items-center justify-between gap-4">
-                <button
-                  onClick={() => router.push(`/blogs/${article?._id}`)}
-                  className="text-xs font-bold text-green-600 flex items-center gap-1 hover:text-green-700 hover:gap-2 transition-all duration-300 group/btn"
-                >
-                  Learn More 
-                  <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center text-[10px] group-hover/btn:bg-green-600 group-hover/btn:text-white transition-all duration-300">✓</div>
-                </button>
-                <button
-                  onClick={(e) => handleLike(article._id, e)}
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 transform hover:scale-110 ${
-                    userLikedArticles.has(article._id)
-                      ? "bg-green-100 text-green-700 shadow-md"
-                      : "bg-gray-100 text-gray-400 hover:bg-green-50 hover:text-green-600"
-                  }`}
-                >
-                  {userLikedArticles.has(article._id) ? (
-                    <FaThumbsUp size={14} />
-                  ) : (
-                    <ThumbsUp size={14} />
-                  )}
-                  <span>{articleLikes[article._id] || 0}</span>
-                </button>
+              {/* Glow background effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-green-200/0 to-green-100/0 group-hover:from-green-200/20 group-hover:to-green-100/20 rounded-2xl transition-all duration-500"></div>
+              
+              <div className="relative z-10">
+                <div className="overflow-hidden rounded-2xl mb-4 relative cursor-pointer group/image" onClick={() => router.push(`/blogs/${article?._id}`)}>
+                  {/* Gradient overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
+                  
+                  <img 
+                    src={article?.image || ''} 
+                    alt="Agriculture" 
+                    className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-700 ease-out cursor-pointer"
+                  />
+                  
+                  {/* Dark overlay on hover */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-all duration-300 rounded-2xl"></div>
+                  
+                  {/* Featured badge with animation */}
+                  <div className="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-105 shadow-lg">
+                    Featured
+                  </div>
+                </div>
+                
+                <h3 className="font-bold text-lg mb-2 leading-tight text-zinc-900 group-hover:text-green-600 transition-colors duration-300 line-clamp-2">
+                  {article?.title}
+                </h3>
+                
+                <p className="text-zinc-500 text-xs mb-4 leading-relaxed line-clamp-2">
+                  {truncateContent(article?.content || '', 100)}
+                </p>
+                
+                <div className="flex items-center justify-between gap-4">
+                  <button
+                    onClick={() => router.push(`/blogs/${article?._id}`)}
+                    className="text-xs font-bold text-green-600 flex items-center gap-1 hover:text-green-700 hover:gap-2 transition-all duration-300 group/btn"
+                  >
+                    Learn More 
+                    <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center text-[10px] group-hover/btn:bg-green-600 group-hover/btn:text-white transition-all duration-300 transform group-hover/btn:scale-110">✓</div>
+                  </button>
+                  
+                  <button
+                    onClick={(e) => handleLike(article._id, e)}
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 transform hover:scale-110 ${
+                      userLikedArticles.has(article._id)
+                        ? "bg-green-100 text-green-700 shadow-md animate-bounce-subtle"
+                        : "bg-gray-100 text-gray-400 hover:bg-green-50 hover:text-green-600"
+                    }`}
+                  >
+                    {userLikedArticles.has(article._id) ? (
+                      <FaThumbsUp size={14} />
+                    ) : (
+                      <ThumbsUp size={14} />
+                    )}
+                    <span>{articleLikes[article._id] || 0}</span>
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -478,8 +599,8 @@ const otherPosts = [
                 {selectedArticle?.title}
               </h3>
               
-              <div className="space-y-4 text-zinc-700 leading-relaxed">
-                <p>{selectedArticle?.fullContent}</p>
+              <div className="space-y-4 text-zinc-700 leading-relaxed prose prose-sm max-w-full">
+                <div dangerouslySetInnerHTML={{ __html: selectedArticle?.fullContent || '' }} />
               </div>
 
               <div className="mt-8 flex gap-4">

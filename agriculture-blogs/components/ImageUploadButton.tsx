@@ -16,9 +16,9 @@ export default function ImageUploadButton({ onImageUpload }: Props) {
     if (!file) return
 
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-    console.log(cloudName);
     
-    const uploadPreset = 'agriculture_log' // Ensure this preset exists in your Cloudinary settings
+    
+    const uploadPreset = 'agriculture_blog' // Ensure this preset exists in your Cloudinary settings
 
     if (!cloudName) {
       alert(

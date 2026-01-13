@@ -93,7 +93,7 @@ export default function BlogEditor({ value, onChange }: Props) {
   }, [value, editor])
   const toggleHeading = (level: number) => {
     if (!editor) return null
-    editor.chain().focus().toggleHeading({ level }).run()
+    editor.chain().focus().toggleHeading({ level: level as any }).run()
     setOpen(false)
   }
 
