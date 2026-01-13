@@ -149,13 +149,13 @@ const AddBlogForm = () => {
             </div>
 
             {/* RIGHT COLUMN: IMAGE */}
-             <div className="flex flex-col">
+            <div className="flex flex-col">
               <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-2">
-                Cover Image
-              </label>
+                 Cover Image
+             </label>
 
-              <div className="flex-1 relative group">
-                <input
+               <div className="flex-1 relative group">
+                 <input
                   type="file"
                   accept="image/*"
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
@@ -165,7 +165,6 @@ const AddBlogForm = () => {
                     }
                   }}
                 />
-
                 <div
                   className={`w-full h-full min-h-72 border-4 border-dashed rounded-[3rem] flex flex-col items-center justify-center p-10 transition-all ${
                     image
@@ -190,7 +189,7 @@ const AddBlogForm = () => {
                   </span>
                 </div>
               </div>
-            </div> 
+            </div>
              <div className="p-6 border border-green-200 rounded-2xl bg-gradient-to-b from-green-50 to-white shadow-md min-h-[400px] overflow-auto transition-all hover:shadow-xl">
   <h2 className="text-2xl font-bold mb-6 text-green-600 tracking-wide border-b pb-2 border-green-200">
     Live Preview
