@@ -149,7 +149,7 @@ const AddBlogForm = () => {
             </div>
 
             {/* RIGHT COLUMN: IMAGE */}
-            <div className="flex flex-col">
+             <div className="flex flex-col">
               <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-2">
                 Cover Image
               </label>
@@ -190,8 +190,18 @@ const AddBlogForm = () => {
                   </span>
                 </div>
               </div>
+            </div> 
+             <div className="p-6 border border-green-200 rounded-2xl bg-gradient-to-b from-green-50 to-white shadow-md min-h-[400px] overflow-auto transition-all hover:shadow-xl">
+  <h2 className="text-2xl font-bold mb-6 text-green-600 tracking-wide border-b pb-2 border-green-200">
+    Live Preview
+  </h2>
+
+  <div
+    className="prose max-w-full text-green-900"
+    dangerouslySetInnerHTML={{ __html: formData.content }}
+  />
+</div>
             </div>
-          </div>
 
           {/* ACTIONS */}
           <div className="mt-12 flex justify-end gap-4 border-t border-slate-100 pt-8">

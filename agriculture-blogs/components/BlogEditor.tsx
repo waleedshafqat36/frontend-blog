@@ -19,6 +19,7 @@ import {
   Unlink,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import { ChevronDown } from "lucide-react"
 
 const ImageUploadButton = dynamic(() => import('./ImageUploadButton'), {
   ssr: false,
@@ -39,15 +40,18 @@ type Props = {
 }
 
 export default function BlogEditor({ value, onChange }: Props) {
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  // const fileInputRef = useRef<HTMLInputElement>(null)
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [linkUrl, setLinkUrl] = useState('')
+  const [open, setOpen] = useState(false)
+  
+
 
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: {
-          levels: [2, 3],
+          levels: [1,2,3,4,5,6],
         },
         codeBlock: {
           languageClassPrefix: 'language-',
@@ -87,6 +91,11 @@ export default function BlogEditor({ value, onChange }: Props) {
       editor.commands.setContent(value)
     }
   }, [value, editor])
+  const toggleHeading = (level: number) => {
+    if (!editor) return null
+    editor.chain().focus().toggleHeading({ level }).run()
+    setOpen(false)
+  }
 
   const handleAddImage = (url: string) => {
     if (editor) {
@@ -146,8 +155,6 @@ export default function BlogEditor({ value, onChange }: Props) {
   const toggleCode = () => editor?.chain().focus().toggleCode().run()
   const toggleBulletList = () => editor?.chain().focus().toggleBulletList().run()
   const toggleOrderedList = () => editor?.chain().focus().toggleOrderedList().run()
-  const toggleHeading2 = () => editor?.chain().focus().toggleHeading({ level: 2 }).run()
-  const toggleHeading3 = () => editor?.chain().focus().toggleHeading({ level: 3 }).run()
   const toggleBlockquote = () => editor?.chain().focus().toggleBlockquote().run()
 
   const ToolbarButton = ({
@@ -204,21 +211,35 @@ export default function BlogEditor({ value, onChange }: Props) {
           isActive={editor.isActive('code')}
         />
 
-        <div className="w-px h-6 bg-slate-200" />
+        <div className="relative inline-block">
+      {/* Main button */}
+      <button
+        onClick={() => setOpen(!open)}
+        className={`flex items-center gap-1 px-3 py-2 rounded-md border border-green-300 bg-green-50 text-green-800 font-semibold hover:bg-green-100 transition`}
+      >
+        Heading
+        <ChevronDown size={16} />
+      </button>
 
-        <ToolbarButton
-          onClick={toggleHeading2}
-          icon={Heading2}
-          title="Heading 2"
-          isActive={editor.isActive('heading', { level: 2 })}
-        />
-        <ToolbarButton
-          onClick={toggleHeading3}
-          icon={Heading3}
-          title="Heading 3"
-          isActive={editor.isActive('heading', { level: 3 })}
-        />
-
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute top-full left-0 mt-1 w-40 bg-white border border-green-200 rounded-md shadow-lg z-50">
+          {[1, 2, 3, 4, 5, 6].map((level) => (
+            <button
+              key={level}
+              onClick={() => toggleHeading(level)}
+              className={`w-full text-left px-4 py-2 hover:bg-green-100 font-medium ${
+                editor.isActive("heading", { levels: level })
+                  ? "bg-green-100 text-green-700"
+                  : "text-green-800"
+              }`}
+            >
+              H{level} Heading
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
         <div className="w-px h-6 bg-slate-200" />
 
         <ToolbarButton
