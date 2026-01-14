@@ -540,6 +540,7 @@ const handleCancelEdit = () => {
   />
 </article>
 
+
       {/* Like/Dislike Section */}
       <section className="max-w-4xl mx-auto px-6 py-8 border-b border-zinc-200 animate-fadeInUp" style={{animationDelay: "0.4s"}}>
         <div className="flex items-center justify-between">

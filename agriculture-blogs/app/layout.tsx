@@ -23,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
 
         {/* 3. Translate function ko initialize karein */}
-       // RootLayout.tsx mein is script ko update karein
+       {/* RootLayout.tsx mein is script ko update karein */}
 <Script id="google-translate-init" strategy="afterInteractive">
   {`
     function googleTranslateElementInit() {
