@@ -179,7 +179,7 @@ const toggleLanguage = async (langCode: 'en' | 'ur') => {
         const response = await fetch(`/api/blog/${blogId}`);
         const data = await response.json();
         if (response.ok) {
-          console.log("Blog data received:", data.detailsBlog);
+          // console.log("Blog data received:", data.detailsBlog);
           setBlog(data.detailsBlog);
           setLikes(data.detailsBlog.likeCount || 0);
           setDislikes(data.detailsBlog.dislikeCount || 0);
@@ -187,7 +187,7 @@ const toggleLanguage = async (langCode: 'en' | 'ur') => {
           // Properly set comments from database
           const blogComments = data.detailsBlog.comments || [];
           setComments(blogComments);
-          console.log("Comments loaded:", blogComments);
+          // console.log("Comments loaded:", blogComments);
           
           // Initialize comment likes/dislikes based on current user
           if (userId && blogComments.length > 0) {
@@ -277,7 +277,7 @@ const toggleLanguage = async (langCode: 'en' | 'ur') => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Comment posted successfully:", data.comments);
+        // console.log("Comment posted successfully:", data.comments);
         setComments(data.comments || []);
         setCommentText("");
       } else {
