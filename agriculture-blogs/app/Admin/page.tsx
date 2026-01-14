@@ -12,7 +12,7 @@ const AddBlogForm = () => {
     content: "", // HTML from TipTap
   })
   const [userName, setUserName] = useState<string>("")
-
+const [isUrdu, setIsUrdu] = useState(false);
   const [image, setImage] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -304,10 +304,17 @@ const AddBlogForm = () => {
                 }
               `}</style>
 
-              <div
-                className="live-preview prose prose-sm max-w-full"
-                dangerouslySetInnerHTML={{ __html: formData.content }}
-              />
+              <div className={`live-preview prose prose-sm max-w-full transition-all duration-300 ${isUrdu  ? 'urdu-font !text-right'  : '!text-left'
+  }`}
+  dir={isUrdu ? 'rtl' : 'ltr'}
+  style={{
+    // Inline style taake koi aur CSS isay rok na sakay
+    textAlign: isUrdu ? 'right' : 'left',
+    fontFamily: isUrdu ? "'Noto Nastaliq Urdu', serif" : 'inherit',
+    lineHeight: isUrdu ? '2.2' : 'normal'
+  }}
+  dangerouslySetInnerHTML={{ __html: formData.content }}
+/>
             </div>
             </div>
 

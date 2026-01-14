@@ -10,13 +10,12 @@ import {
   Italic,
   List,
   ListOrdered,
-  Heading2,
-  Heading3,
   Link as LinkIcon,
   Image as ImageIcon,
   Code,
   Quote,
   Unlink,
+  Languages,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { ChevronDown } from "lucide-react"
@@ -44,6 +43,8 @@ export default function BlogEditor({ value, onChange }: Props) {
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [linkUrl, setLinkUrl] = useState('')
   const [open, setOpen] = useState(false)
+  // Default English ke liye false rakhein
+const [isUrdu, setIsUrdu] = useState(false);
   
 
 
@@ -80,10 +81,33 @@ export default function BlogEditor({ value, onChange }: Props) {
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none min-h-[300px] w-full [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:my-4 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:my-3',
+       class: `prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none min-h-[300px] w-full ${isUrdu ? 'urdu-font' : ''}`,
+      dir: isUrdu ? 'rtl' : 'ltr',
       },
+      handleTextInput(view, from, to, text) {
+      // Agar toggle off hai (false), to normal English chalne de
+      if (!isUrdu) return false;
+
+     const urduMap = {
+  'a': 'ا', 'b': 'ب', 'p': 'پ', 't': 'ت', 'T': 'ٹ', 'C': 'ث',
+  'j': 'ج', 'c': 'چ', 'h': 'ح', 'K': 'خ', 'd': 'د', 'D': 'ڈ',
+  'z': 'ذ', 'r': 'ر', 'R': 'ڑ', 'Z': 'ز', 'X': 'ژ', 's': 'س',
+  'S': 'ش', 'v': 'ص', 'V': 'ض', 'F': 'ظ', 'e': 'ع',
+  'G': 'غ', 'f': 'ف', 'q': 'ق', 'k': 'ک', 'g': 'گ', 'l': 'ل',
+  'm': 'م', 'n': 'ن', 'w': 'و', 'o': 'ہ', 'i': 'ی', 'y': 'ے',
+  ' ': ' ', '.': '۔', ',': '،', '?': '؟'
+};
+
+
+      if (urduMap[text] as string) {
+        view.dispatch(view.state.tr.insertText(urduMap[text], from, to));
+        return true;
+      }
+      return false;
     },
+  },
     immediatelyRender: false,
+    
   })
 
   useEffect(() => {
@@ -93,7 +117,7 @@ export default function BlogEditor({ value, onChange }: Props) {
   }, [value, editor])
   const toggleHeading = (level: number) => {
     if (!editor) return null
-    editor.chain().focus().toggleHeading({ level: level as any }).run()
+    editor.chain().focus().toggleHeading({ level }).run()
     setOpen(false)
   }
 
@@ -119,6 +143,20 @@ export default function BlogEditor({ value, onChange }: Props) {
     setShowLinkInput(true)
     setLinkUrl('')
   }
+  // 
+  useEffect(() => {
+  if (editor) {
+    // Ye line editor ke attributes ko manually refresh kar degi jab state badle gi
+    editor.setOptions({
+      editorProps: {
+        attributes: {
+          class: `prose focus:outline-none min-h-[300px] w-full ${isUrdu ? 'urdu-font' : ''}`,
+          dir: isUrdu ? 'rtl' : 'ltr',
+        },
+      },
+    })
+  }
+}, [isUrdu, editor])
 
   const confirmLink = () => {
     if (!linkUrl) {
@@ -198,6 +236,7 @@ export default function BlogEditor({ value, onChange }: Props) {
           title="Bold"
           isActive={editor.isActive('bold')}
         />
+      
         <ToolbarButton
           onClick={toggleItalic}
           icon={Italic}
@@ -313,7 +352,21 @@ export default function BlogEditor({ value, onChange }: Props) {
           </div>
         )}
 
-        <ImageUploadButton onImageUpload={handleAddImage} />
+    <ImageUploadButton onImageUpload={handleAddImage} />
+<div className="relative">
+  <ToolbarButton
+    onClick={() => setIsUrdu(!isUrdu)}
+    icon={Languages}
+    title={isUrdu ? "Switch to English" : "Switch to Urdu"}
+    isActive={isUrdu}
+  />
+  {/* Chota sa indicator badge */}
+  <span className={`absolute -top-1 -right-1 pointer-events-none px-1 rounded text-[7px] font-bold uppercase ${
+    isUrdu ? 'bg-white text-green-600' : 'bg-slate-400 text-white'
+  }`}>
+    {isUrdu ? "Ur" : "En"}
+  </span>
+</div>
       </div>
 
       {/* EDITOR */}

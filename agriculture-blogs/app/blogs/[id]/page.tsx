@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
-import { ArrowLeft, Facebook, Twitter, Instagram, Linkedin, ThumbsUp, ThumbsDown, MessageCircle, Edit2, Trash2 } from "lucide-react";
+import { ArrowLeft, Facebook, Twitter, Instagram, Linkedin, ThumbsUp, ThumbsDown, MessageCircle, Edit2, Trash2, Globe } from "lucide-react";
 import { useEffect, useState } from "react";
 
 // Add animations to globals
@@ -116,7 +116,38 @@ const BlogPost = () => {
   const [commentDislikes, setCommentDislikes] = useState<{[key: string]: boolean}>({});
   const params = useParams();
   const blogId = params.id as string | string[] | undefined;
+  const [isUrdu, setIsUrdu] = useState(false)
 
+const toggleLanguage = async (langCode: 'en' | 'ur') => {
+  // Pehle direction aur UI switch kar dein taake user ko foran response mile
+  setIsUrdu(langCode === 'ur');
+
+  const triggerGoogleTranslate = () => {
+    const selectElement = document.querySelector('.goog-te-combo') as HTMLSelectElement;
+    
+    if (selectElement) {
+      if (langCode === 'en') {
+        selectElement.value = ''; // Original English ke liye khali chordein
+      } else {
+        selectElement.value = 'ur';
+      }
+      selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+    } else {
+      // Agar abhi tak load nahi hua, to 500ms baad phir try karein (sirf 3 baar)
+      console.log("Waiting for Google Translate to initialize...");
+    }
+  };
+
+  // 1 second ka gap dein taake script init ho jaye agar pehle nahi hui
+  setTimeout(triggerGoogleTranslate, 500);
+};
+  useEffect(() => {
+    if (isUrdu) {
+      document.documentElement.dir = "rtl";
+    } else {
+      document.documentElement.dir = "ltr";
+    }
+  }, [isUrdu]);
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -434,6 +465,7 @@ const handleCancelEdit = () => {
             Contact
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
           </a>
+         
           {user?.role === 'admin' && (
             <a href="/Admin" className="hover:text-green-500 transition duration-300 relative group">
               Admin
@@ -441,12 +473,26 @@ const handleCancelEdit = () => {
             </a>
           )}
         </div>
+        <div className="flex items-center gap-4">
         <button 
           onClick={handleLogout}
           className="bg-linear-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-full text-sm font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
-        >
+          >
           Log out
         </button>
+        <button
+  onClick={() => toggleLanguage(isUrdu ? 'en' : 'ur')}
+  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all border ${
+    isUrdu ? 'bg-green-600 text-white border-green-700' : 'bg-white text-zinc-700 border-zinc-200'
+  }`}
+>
+  <Globe size={16} className={isUrdu ? "animate-spin" : ""} />
+  {isUrdu ? "En" : " اردو"} 
+</button>
+
+{/* Yeh hidden hona chahiye Google Translate ke liye */}
+<div id="google_translate_element" style={{ display: 'none' }}></div>
+    </div>
       </nav>
 
      
@@ -457,7 +503,7 @@ const handleCancelEdit = () => {
           <span className="inline-block bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-bold mb-4 hover-lift">
             {blog?.category}
           </span>
-          <h1 className="text-5xl font-bold leading-tight mb-4 text-zinc-900 hover-lift transition-transform duration-300">
+          <h1 dir="auto" className="text-5xl font-bold leading-tight mb-4 text-zinc-900 hover-lift transition-transform duration-300">
             {blog?.title}
           </h1>
           <div className="flex items-center gap-4 text-zinc-600 text-sm animate-fadeInUp" style={{animationDelay: "0.2s"}}>
@@ -479,149 +525,20 @@ const handleCancelEdit = () => {
       </header>
 
       {/* Blog Content */}
-      <article className="max-w-4xl mx-auto px-6 py-12">
-        <style>{`
-          .blog-content h1 {
-            font-size: 2.25rem;
-            font-weight: bold;
-            margin: 1.5rem 0 1rem 0;
-            color: #1f2937;
-            line-height: 1.3;
-          }
-          .blog-content h2 {
-            font-size: 1.875rem;
-            font-weight: bold;
-            margin: 1.5rem 0 0.875rem 0;
-            color: #1f2937;
-            line-height: 1.3;
-          }
-          .blog-content h3 {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin: 1.25rem 0 0.75rem 0;
-            color: #374151;
-            line-height: 1.3;
-          }
-          .blog-content h4 {
-            font-size: 1.25rem;
-            font-weight: bold;
-            margin: 1rem 0 0.625rem 0;
-            color: #374151;
-            line-height: 1.3;
-          }
-          .blog-content h5 {
-            font-size: 1.125rem;
-            font-weight: bold;
-            margin: 0.875rem 0 0.5rem 0;
-            color: #4b5563;
-            line-height: 1.3;
-          }
-          .blog-content h6 {
-            font-size: 1rem;
-            font-weight: bold;
-            margin: 0.75rem 0 0.5rem 0;
-            color: #4b5563;
-            line-height: 1.3;
-          }
-          .blog-content p {
-            margin: 1rem 0;
-            line-height: 1.8;
-            color: #374151;
-            font-size: 1rem;
-          }
-          .blog-content ul {
-            list-style-type: disc;
-            margin: 1rem 0;
-            padding-left: 2rem;
-            color: #374151;
-          }
-          .blog-content ol {
-            list-style-type: decimal;
-            margin: 1rem 0;
-            padding-left: 2rem;
-            color: #374151;
-          }
-          .blog-content li {
-            margin: 0.5rem 0;
-            line-height: 1.6;
-          }
-          .blog-content blockquote {
-            border-left: 4px solid #16a34a;
-            padding-left: 1rem;
-            margin: 1.5rem 0;
-            color: #4b5563;
-            font-style: italic;
-            background-color: #f0fdf4;
-            padding: 1rem;
-          }
-          .blog-content strong, .blog-content b {
-            font-weight: bold;
-            color: #1f2937;
-          }
-          .blog-content em, .blog-content i {
-            font-style: italic;
-          }
-          .blog-content a {
-            color: #0066cc;
-            text-decoration: underline;
-            transition: color 0.3s ease;
-          }
-          .blog-content a:hover {
-            color: #0052a3;
-          }
-          .blog-content code {
-            background-color: #f3f4f6;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: 'Courier New', monospace;
-            color: #dc2626;
-            font-size: 0.9em;
-          }
-          .blog-content pre {
-            background-color: #1f2937;
-            color: #e5e7eb;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            overflow-x: auto;
-            margin: 1rem 0;
-            font-family: 'Courier New', monospace;
-          }
-          .blog-content pre code {
-            background-color: transparent;
-            color: #e5e7eb;
-            padding: 0;
-          }
-          .blog-content img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin: 1rem 0;
-          }
-          .blog-content table {
-            border-collapse: collapse;
-            width: 100%;
-            margin: 1rem 0;
-          }
-          .blog-content th {
-            background-color: #16a34a;
-            color: white;
-            padding: 0.75rem;
-            text-align: left;
-          }
-          .blog-content td {
-            border: 1px solid #d1d5db;
-            padding: 0.75rem;
-          }
-          .blog-content tr:nth-child(even) {
-            background-color: #f9fafb;
-          }
-        `}</style>
-        <div
-          className="blog-content text-gray-700 leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: blog?.content || '' }}
-        />
-      </article>
+      
+    <article className={`max-w-4xl mx-auto px-6 py-12 ${isUrdu ? 'urdu-mode' : 'english-mode'}`}>
+  {/* 1. Google Translate Container (Isay hidden mat karein, bas small kar dein) */}
+  <div id="google_translate_element" style={{ opacity: 0, height: '1px', position: 'absolute' }}></div>
+  
+  {/* 2. Content Div */}
+  <div
+    // 'dir' state ke mutabiq switch hoga taake alignment foran badal jaye
+    dir={isUrdu ? "rtl" : "ltr"}
+    // Class name bhi dynamic honi chahiye
+    className={`blog-content text-gray-700 leading-relaxed ${isUrdu ? 'urdu-text-style' : 'english-text-style'}`}
+    dangerouslySetInnerHTML={{ __html: blog?.content || '' }}
+  />
+</article>
 
       {/* Like/Dislike Section */}
       <section className="max-w-4xl mx-auto px-6 py-8 border-b border-zinc-200 animate-fadeInUp" style={{animationDelay: "0.4s"}}>
