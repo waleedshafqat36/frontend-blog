@@ -513,7 +513,7 @@ const handleCancelEdit = () => {
             {blog?.category}
           </span>
           <h1 dir="auto" className="text-5xl font-bold leading-tight mb-4 text-zinc-900 hover-lift transition-transform duration-300">
-            {blog?.title}
+            {isUrdu? blog?.titleUrdu : blog?.title}
           </h1>
           <div className="flex items-center gap-4 text-zinc-600 text-sm animate-fadeInUp" style={{animationDelay: "0.2s"}}>
             <span>By {blog?.author}</span>

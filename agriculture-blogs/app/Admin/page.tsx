@@ -100,6 +100,7 @@ const [isUrdu, setIsUrdu] = useState(false);
     }
 
     data.append("contentUrdu", urduContent)
+    data.append("isUrdu", String(isUrdu))
     data.append("author", formData.author) // Author from logged-in user
     data.append("category", formData.category)
     data.append("content", englishContent)
@@ -159,20 +160,19 @@ const [isUrdu, setIsUrdu] = useState(false);
                 <BlogEditor
                   valueEn={formData.content}
                   valueUr={formData.contentUrdu}
-                  onChangeEn={(html) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      content: html,
-                    }))
-                  }
-                  onChangeUr={(html) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      contentUrdu: html,
-                    }))
-                  }
+                  onChangeEn={(html) => {
+                    console.log('onChangeEn -> html length', html?.length)
+                    setFormData((prev) => ({ ...prev, content: html }))
+                  }}
+                  onChangeUr={(html) => {
+                    console.log('onChangeUr -> html length', html?.length)
+                    setFormData((prev) => ({ ...prev, contentUrdu: html }))
+                  }}
                   isUrdu={isUrdu}
-                  onIsUrduChange={setIsUrdu}
+                  onIsUrduChange={(next) => {
+                    console.log('onIsUrduChange ->', next, 'formData.contentUrdu length', formData.contentUrdu?.length)
+                    setIsUrdu(next)
+                  }}
                 />
               </div>
 
