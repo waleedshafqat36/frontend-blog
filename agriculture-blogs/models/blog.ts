@@ -25,6 +25,7 @@ const blogSchema = new mongoose.Schema({
     required: [true, "Blog title is required"],
     trim: true
   },
+  titleUrdu: { type: String, required: true },
   author: {
     type: String,
     required: [true, "Author name is required"],
@@ -40,6 +41,7 @@ const blogSchema = new mongoose.Schema({
     type: String,
     required: [true, "Blog content is required"]
   },
+  contentUrdu: { type: String, required: true },
   image: {
     type: String, // Cloudinary secure_url
     required: [true, "Blog image is required"]
@@ -68,5 +70,5 @@ const blogSchema = new mongoose.Schema({
   timestamps: true 
 });
 
-const Blog = mongoose.models.Blog || mongoose.model("Blog", blogSchema);
+const Blog = mongoose.models.Blogs || mongoose.model("Blogs", blogSchema);
 export default Blog;

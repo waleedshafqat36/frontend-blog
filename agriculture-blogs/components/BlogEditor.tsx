@@ -34,17 +34,49 @@ const ImageUploadButton = dynamic(() => import('./ImageUploadButton'), {
 })
 
 type Props = {
-  value: string
-  onChange: (value: string) => void
+  // English content (preferred)
+  valueEn?: string;
+  // Urdu content (preferred)
+  valueUr?: string;
+  onChangeEn?: (v: string) => void;
+  onChangeUr?: (v: string) => void;
+  // Legacy single-prop API support
+  value?: string;
+  onChange?: (v: string) => void;
+  // Optional language sync with parent
+  isUrdu?: boolean;
+  onIsUrduChange?: (isUrdu: boolean) => void;
 }
 
-export default function BlogEditor({ value, onChange }: Props) {
+export default function BlogEditor(props: Props) {
+  const {
+    valueEn,
+    valueUr,
+    onChangeEn,
+    onChangeUr,
+    value,
+    onChange,
+    isUrdu: isUrduProp,
+    onIsUrduChange,
+  } = props
+
+  // Fallbacks to support older `value`/`onChange` usage
+  const contentEn = valueEn ?? value ?? ''
+  const contentUr = valueUr ?? ''
+  const handleChangeEn = onChangeEn ?? onChange ?? (() => {})
+  const handleChangeUr = onChangeUr ?? (() => {})
   // const fileInputRef = useRef<HTMLInputElement>(null)
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [linkUrl, setLinkUrl] = useState('')
   const [open, setOpen] = useState(false)
   // Default English ke liye false rakhein
-const [isUrdu, setIsUrdu] = useState(false);
+const [isUrdu, setIsUrdu] = useState<boolean>(isUrduProp ?? false);
+
+  useEffect(() => {
+    if (typeof isUrduProp === 'boolean' && isUrduProp !== isUrdu) {
+      setIsUrdu(isUrduProp)
+    }
+  }, [isUrduProp])
   
 
 
@@ -75,49 +107,55 @@ const [isUrdu, setIsUrdu] = useState(false);
         },
       }),
     ],
-    content: value,
+    content: isUrdu ? contentUr : contentEn,
     onUpdate({ editor }) {
-      onChange(editor.getHTML())
+      const html = editor.getHTML();
+      if (isUrdu) {
+        handleChangeUr(html); // Agar Urdu mode on hai
+      } else {
+        handleChangeEn(html); // Warna English mode
+      }
     },
     editorProps: {
       attributes: {
-       class: `prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none min-h-[300px] w-full ${isUrdu ? 'urdu-font' : ''}`,
-      dir: isUrdu ? 'rtl' : 'ltr',
+        class: `prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none min-h-[300px] w-full ${isUrdu ? 'urdu-font' : ''}`,
+        dir: isUrdu ? 'rtl' : 'ltr',
       },
       handleTextInput(view, from, to, text) {
-      // Agar toggle off hai (false), to normal English chalne de
-      if (!isUrdu) return false;
+        // Agar toggle off hai (false), to normal English chalne de
+        if (!isUrdu) return false;
 
-     const urduMap = {
-  'a': 'ا', 'b': 'ب', 'p': 'پ', 't': 'ت', 'T': 'ٹ', 'C': 'ث',
-  'j': 'ج', 'c': 'چ', 'h': 'ح', 'K': 'خ', 'd': 'د', 'D': 'ڈ',
-  'z': 'ذ', 'r': 'ر', 'R': 'ڑ', 'Z': 'ز', 'X': 'ژ', 's': 'س',
-  'S': 'ش', 'v': 'ص', 'V': 'ض', 'F': 'ظ', 'e': 'ع',
-  'G': 'غ', 'f': 'ف', 'q': 'ق', 'k': 'ک', 'g': 'گ', 'l': 'ل',
-  'm': 'م', 'n': 'ن', 'w': 'و', 'o': 'ہ', 'i': 'ی', 'y': 'ے',
-  ' ': ' ', '.': '۔', ',': '،', '?': '؟'
-};
+        const urduMap: Record<string, string> = {
+          a: 'ا', b: 'ب', p: 'پ', t: 'ت', T: 'ٹ', C: 'ث',
+          j: 'ج', c: 'چ', h: 'ح', K: 'خ', d: 'د', D: 'ڈ',
+          z: 'ذ', r: 'ر', R: 'ڑ', Z: 'ز', X: 'ژ', s: 'س',
+          S: 'ش', v: 'ص', V: 'ض', F: 'ظ', e: 'ع',
+          G: 'غ', f: 'ف', q: 'ق', k: 'ک', g: 'گ', l: 'ل',
+          m: 'م', n: 'ن', w: 'و', o: 'ہ', i: 'ی', y: 'ے',
+          ' ': ' ', '.': '۔', ',': '،', '?': '؟',
+        };
 
-
-      if (urduMap[text] as string) {
-        view.dispatch(view.state.tr.insertText(urduMap[text], from, to));
-        return true;
-      }
-      return false;
+        const mapped = urduMap[text];
+        if (mapped) {
+          view.dispatch(view.state.tr.insertText(mapped, from, to));
+          return true;
+        }
+        return false;
+      },
     },
-  },
     immediatelyRender: false,
-    
   })
 
   useEffect(() => {
-    if (editor && value && editor.getHTML() !== value) {
-      editor.commands.setContent(value)
+    if (!editor) return
+    const content = isUrdu ? contentUr : contentEn
+    if (content !== undefined && editor.getHTML() !== content) {
+      editor.commands.setContent(content)
     }
-  }, [value, editor])
-  const toggleHeading = (level: number) => {
+  }, [isUrdu, contentEn, contentUr, editor])
+  const toggleHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
     if (!editor) return null
-    editor.chain().focus().toggleHeading({ level }).run()
+    editor.chain().focus().toggleHeading({ level: level as any }).run()
     setOpen(false)
   }
 
@@ -266,11 +304,11 @@ const [isUrdu, setIsUrdu] = useState(false);
           {[1, 2, 3, 4, 5, 6].map((level) => (
             <button
               key={level}
-              onClick={() => toggleHeading(level)}
+              onClick={() => toggleHeading(level as 1 | 2 | 3 | 4 | 5 | 6)}
               className={`w-full text-left px-4 py-2 hover:bg-green-100 font-medium ${
-                editor.isActive("heading", { levels: level })
-                  ? "bg-green-100 text-green-700"
-                  : "text-green-800"
+                editor.isActive('heading', { level: level as any })
+                  ? 'bg-green-100 text-green-700'
+                  : 'text-green-800'
               }`}
             >
               H{level} Heading
@@ -355,7 +393,11 @@ const [isUrdu, setIsUrdu] = useState(false);
     <ImageUploadButton onImageUpload={handleAddImage} />
 <div className="relative">
   <ToolbarButton
-    onClick={() => setIsUrdu(!isUrdu)}
+    onClick={() => {
+      const next = !isUrdu
+      setIsUrdu(next)
+      onIsUrduChange?.(next)
+    }}
     icon={Languages}
     title={isUrdu ? "Switch to English" : "Switch to Urdu"}
     isActive={isUrdu}

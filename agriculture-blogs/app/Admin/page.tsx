@@ -8,7 +8,10 @@ import BlogEditor from "@/components/BlogEditor"
 const AddBlogForm = () => {
   const [formData, setFormData] = useState({
     title: "",
+    author:"  ",
+    titleUrdu: "",
     category: "Agriculture",
+    contentUrdu: "", 
     content: "", // HTML from TipTap
   })
   const [userName, setUserName] = useState<string>("")
@@ -21,6 +24,8 @@ const [isUrdu, setIsUrdu] = useState(false);
   useEffect(() => {
     // First try to get from localStorage
     const storedUser = localStorage.getItem('user')
+    // console.log(storedUser);
+    
     if (storedUser) {
       try {
         const userData = JSON.parse(storedUser)
@@ -64,9 +69,40 @@ const [isUrdu, setIsUrdu] = useState(false);
 
     const data = new FormData()
     data.append("title", formData.title)
-    data.append("author", userName) // Author from logged-in user
+    data.append("titleUrdu", formData.titleUrdu) // Urdu title same as title for now
+    // Ensure Urdu content is sent to `contentUrdu` and English to `content`.
+    let englishContent = formData.content || ''
+    let urduContent = formData.contentUrdu || ''
+
+    // If editor was left in Urdu mode and englishContent contains the latest text,
+    // move it to `contentUrdu` to avoid losing the Urdu content.
+    if (isUrdu) {
+      if (!urduContent && englishContent) {
+        urduContent = englishContent
+        englishContent = ''
+      }
+    } else {
+      if (!englishContent && urduContent) {
+        englishContent = urduContent
+        urduContent = ''
+      }
+    }
+
+    // Fallback: detect Arabic/Urdu script in the submitted HTML and store accordingly.
+    try {
+      const arabicScript = /\p{Script=Arabic}/u
+      if (englishContent && arabicScript.test(englishContent)) {
+        urduContent = englishContent
+        englishContent = ''
+      }
+    } catch (e) {
+      // If the environment doesn't support Unicode property escapes, skip detection
+    }
+
+    data.append("contentUrdu", urduContent)
+    data.append("author", formData.author) // Author from logged-in user
     data.append("category", formData.category)
-    data.append("content", formData.content)
+    data.append("content", englishContent)
     if (image) data.append("image", image)
 
     try {
@@ -121,13 +157,22 @@ const [isUrdu, setIsUrdu] = useState(false);
                 </label>
 
                 <BlogEditor
-                  value={formData.content}
-                  onChange={(html) =>
+                  valueEn={formData.content}
+                  valueUr={formData.contentUrdu}
+                  onChangeEn={(html) =>
                     setFormData((prev) => ({
                       ...prev,
                       content: html,
                     }))
                   }
+                  onChangeUr={(html) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      contentUrdu: html,
+                    }))
+                  }
+                  isUrdu={isUrdu}
+                  onIsUrduChange={setIsUrdu}
                 />
               </div>
 
@@ -139,8 +184,22 @@ const [isUrdu, setIsUrdu] = useState(false);
                 <input
                   type="text"
                   name="title"
+                  placeholder="Enter your Blog Title..."
                   required
                   value={formData.title}
+                  onChange={handleChange}
+                  className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:border-green-500 outline-none font-semibold"
+                />
+                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                  Blog Title In Urdu
+                </label>
+                <input
+                dir="rtl"
+                  type="text"
+                  name="titleUrdu"
+                  placeholder="In Urdu..."
+                  required
+                  value={formData.titleUrdu}
                   onChange={handleChange}
                   className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:border-green-500 outline-none font-semibold"
                 />
@@ -169,9 +228,15 @@ const [isUrdu, setIsUrdu] = useState(false);
                   <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">
                     Author
                   </label>
-                  <div className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center text-slate-700 font-semibold">
-                    {userName || "Loading..."}
-                  </div>
+                  <input
+                    type="text"
+                    name="author"
+                    placeholder="Enter Author Name..."
+                    required
+                    value={formData.author}
+                    onChange={handleChange}
+                    className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:border-green-500 outline-none font-semibold"
+                  />
                 </div>
               </div>
 
@@ -304,17 +369,14 @@ const [isUrdu, setIsUrdu] = useState(false);
                 }
               `}</style>
 
-              <div className={`live-preview prose prose-sm max-w-full transition-all duration-300 ${isUrdu  ? 'urdu-font !text-right'  : '!text-left'
-  }`}
-  dir={isUrdu ? 'rtl' : 'ltr'}
-  style={{
-    // Inline style taake koi aur CSS isay rok na sakay
-    textAlign: isUrdu ? 'right' : 'left',
-    fontFamily: isUrdu ? "'Noto Nastaliq Urdu', serif" : 'inherit',
-    lineHeight: isUrdu ? '2.2' : 'normal'
-  }}
-  dangerouslySetInnerHTML={{ __html: formData.content }}
-/>
+ <div
+    dir={isUrdu ? "rtl" : "ltr"}
+    className={`blog-content ${isUrdu ? 'urdu-text-style' : 'english-text-style'}`}
+    dangerouslySetInnerHTML={{ 
+      // Main Logic: Database se language ke mutabiq field uthao
+      __html: isUrdu ? formData?.contentUrdu : formData?.content 
+    }}
+  /> 
             </div>
             </div>
 

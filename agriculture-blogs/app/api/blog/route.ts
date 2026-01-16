@@ -1,40 +1,10 @@
 import cloudinary from "@/lib/cloudinary";
 import ConnectDB from "@/lib/db";
 import Blog from "@/models/blog";
+import { log } from "console";
 import { NextResponse } from "next/server";
 
-
-// export async function POST(req: Request) {  
-// try {
-//     const formData = await req.formData();
-//     const title = formData.get("title") as string;
-//     const author = formData.get("author") as string;
-//     const category = formData.get("category") as string;
-//     const content = formData.get("content") as string;
-//     const file = formData.get("image") as File;
-//     console.log("Received file:", file); 
-//     if (!file) {
-//         return NextResponse.json({ message: "Image file is required" }, { status: 400 });
-        
-//     }
-//     await ConnectDB();
-   
-// const UploadResources = await cloudinary.uploader.upload(file , {
-//   resource_type: "auto",
-//   folder: "blogs",
-// });
-//     const blog = await Blog.create({
-//         title,
-//         author, 
-//         category,
-//         content,
-//         image: UploadResources.secure_url
-//     });
-//     return NextResponse.json({ success: true, blog }, { status: 201 }); 
-// } catch (error) {
-//     console.error("Error creating blog:", error);
-// }
-// } 
+//  FETCH ALL BLOGS
 export async function GET() {
     try {
         await ConnectDB();
@@ -45,16 +15,31 @@ export async function GET() {
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }  
  }
+
+
+
+
+//  BLOG CREATION WITH IMAGE UPLOAD TO CLOUDINARY
  export async function POST(req: Request) {  
   try {
     const formData = await req.formData();
-    const title = formData.get("title") as string;
-    const author = formData.get("author") as string;
-    const category = formData.get("category") as string;
-    const content = formData.get("content") as string;
-    const file = formData.get("image") as File;
+    const toStr = (key: string) => {
+      const v = formData.get(key);
+      if (v === null) return '';
+      if (typeof v === 'string') return v;
+      if (v instanceof File) return '';
+      return String(v);
+    }
 
-    console.log("Received data:", { title, author, category, content, fileName: file?.name });
+    let title = toStr('title')
+    let titleUrdu = toStr('titleUrdu')
+    let contentUrdu = toStr('contentUrdu')
+    let author = toStr('author')
+    let category = toStr('category')
+    let content = toStr('content')
+    const file = formData.get("image") as File | null;
+
+    console.log("Received data:", { title, titleUrdu, author, category, content: content?.slice?.(0,120), contentUrdu: contentUrdu?.slice?.(0,120), fileName: file?.name });
 
     if (!file) {
       return NextResponse.json({ message: "Image is missing" }, { status: 400 });
@@ -78,15 +63,40 @@ export async function GET() {
       stream.end(buffer);
     });
 
+    // Normalize inputs
+    title = title.trim()
+    titleUrdu = titleUrdu.trim()
+    author = author.trim()
+    category = category || 'Agriculture'
+    content = content || ''
+    contentUrdu = contentUrdu || ''
+
+    // Detect Arabic/Urdu characters (covers common Arabic, Urdu ranges)
+    const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/
+    // If titleUrdu empty but title contains Arabic script, use it
+    if (!titleUrdu && arabicRegex.test(title)) {
+      titleUrdu = title
+      title = ''
+    }
+    // If contentUrdu empty but content contains Arabic script, move it
+    if (!contentUrdu && content && arabicRegex.test(content)) {
+      contentUrdu = content
+      content = ''
+    }
+
+    console.log('Storing to DB:', { title: title.slice(0,60), titleUrdu: titleUrdu.slice(0,60), content: content.slice(0,60), contentUrdu: contentUrdu.slice(0,60) });
+
     // 3. Database Entry
     const blog = await Blog.create({
       title,
-      author, 
+      titleUrdu,
+      author,
       category,
       content,
+      contentUrdu,
       image: uploadResponse.secure_url // Cloudinary link
     });
-
+  console.log("Blog created successfully:", blog);
     return NextResponse.json({ success: true, blog }, { status: 201 }); 
 
   } catch (error: any) {

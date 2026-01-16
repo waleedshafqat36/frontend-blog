@@ -173,11 +173,13 @@ const toggleLanguage = async (langCode: 'en' | 'ur') => {
 
   useEffect(() => {
     if (!blogId) return;
-
+// fetch blog details from API
     const fetchBlogDetails = async () => {
       try {
         const response = await fetch(`/api/blog/${blogId}`);
         const data = await response.json();
+        console.log(data);
+        
         if (response.ok) {
           // console.log("Blog data received:", data.detailsBlog);
           setBlog(data.detailsBlog);
@@ -218,11 +220,13 @@ const toggleLanguage = async (langCode: 'en' | 'ur') => {
         console.error("Error fetching blog details:", error);
       }
     };
-
+// Related blogs fetch karne ka function
     const fetchRelated = async (category: string, currentId: string | string[]) => {
         try {
             const res = await fetch(`/api/blog`); 
             const data = await res.json();
+          console.log("data", data);
+          
             if (res.ok) {
                 const filtered = data.blogs.filter((b: Blog) => b._id !== currentId && b.category === category);
                 setRelatedBlogs(filtered.slice(0, 3));
@@ -234,7 +238,7 @@ const toggleLanguage = async (langCode: 'en' | 'ur') => {
 
     fetchBlogDetails();
   }, [blogId]);
-
+// Like/Dislike handlers
   const handleLikeDislike = async (action: "like" | "dislike") => {
     if (!userId || !blogId) return;
 
@@ -259,7 +263,7 @@ const toggleLanguage = async (langCode: 'en' | 'ur') => {
       console.error("Error:", error);
     }
   };
-
+// Add Comment handler
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     const authorName = user?.name || "Anonymous";
@@ -267,6 +271,7 @@ const toggleLanguage = async (langCode: 'en' | 'ur') => {
 
     setIsLoadingComment(true);
     try {
+      // post comment to API endpoint
       const response = await fetch(`/api/blog/${blogId}/comment`, {
         method: "POST",
         headers: {
@@ -289,19 +294,23 @@ const toggleLanguage = async (langCode: 'en' | 'ur') => {
       setIsLoadingComment(false);
     }
   };
+  // Edit Comment handlers
   const handleEditComment = (id: string, author: string, text: string) => {
   setEditingCommentId(id);
   setEditAuthor(author);
   setEditText(text);
 };
+// Cancel Edit handler
 const handleCancelEdit = () => {
   setEditingCommentId(null);
   setEditAuthor("");
   setEditText("");
 };
+// Edit Comment handler for submission
   const handleEditComments = async () => {
      if (!editAuthor.trim() || !editText.trim()) return;
     try {
+      // Update comment to API endpoint
       const response = await fetch(`/api/blog/${blogId}/comment`, {
         method: "PUT",
         headers: {
@@ -331,7 +340,7 @@ const handleCancelEdit = () => {
       console.error("Error updating comment:", error);
     }
   }; 
-
+// Delete Comment handler
   const handleDeleteComment = async (commentId: string) => {
     try {
       const response = await fetch(`/api/blog/${blogId}/comment`, {
@@ -351,7 +360,7 @@ const handleCancelEdit = () => {
       console.error("Error deleting comment:", error);
     }
   };
-
+// Comment Like/Dislike handler
   const handleCommentLikeDislike = async (commentId: string, action: "like" | "dislike") => {
     if (!userId || !blogId) return;
 
@@ -536,7 +545,7 @@ const handleCancelEdit = () => {
     dir={isUrdu ? "rtl" : "ltr"}
     // Class name bhi dynamic honi chahiye
     className={`blog-content text-gray-700 leading-relaxed ${isUrdu ? 'urdu-text-style' : 'english-text-style'}`}
-    dangerouslySetInnerHTML={{ __html: blog?.content || '' }}
+    dangerouslySetInnerHTML={{ __html: isUrdu ? blog?.contentUrdu : blog?.content }}
   />
 </article>
 
