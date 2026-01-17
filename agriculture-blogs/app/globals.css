@@ -178,7 +178,7 @@ body {
 
 /* --- PARAGRAPHS (Main Text) --- */
 .urdu-mode .blog-content p {
-  font-size: 1.35rem !important;
+  font-size: 1.1rem !important;
   line-height: 2.6 !important; /* Urdu ke liye gap zyada rakha hai */
   margin-bottom: 1.5rem !important;
   text-align: right !important;
@@ -195,7 +195,7 @@ body {
 }
 
 .urdu-mode .blog-content li {
-  font-size: 1.25rem !important;
+  font-size: 1.1rem !important;
   line-height: 2.4 !important;
   margin-bottom: 0.5rem !important;
   text-align: right !important;
@@ -236,7 +236,7 @@ body {
         .english-mode .blog-content ul, .english-mode .blog-content ol { padding-right: 0; padding-left: 1.5rem; }
         .urdu-text-style {
     font-family: 'Noto Nastaliq Urdu', serif !important;
-    font-size: 1.35rem !important; /* Bara font size taake parhnay mein asani ho */
+    font-size: 1rem !important; /* Bara font size taake parhnay mein asani ho */
     line-height: 2.6 !important;  /* Urdu ke liye line gap zyada zarori hai */
     text-align: right !important;
   }
@@ -250,7 +250,7 @@ body {
 
   /* Heading fix karein jab Urdu ho */
   .urdu-text-style h1, .urdu-text-style h2, .urdu-text-style h3 {
-    line-height: 1.5 !important;
+    line-height: 1 !important;
     margin-bottom: 1.5rem !important;
     font-weight: 700;
   }
@@ -260,14 +260,14 @@ body {
     margin-bottom: 2rem !important;
   }
           .blog-content h1 {
-            font-size: 2.25rem;
+            font-size: 1rem;
             font-weight: bold;
             margin: 1.5rem 0 1rem 0;
             color: #1f2937;
             line-height: 1.3;
           }
           .blog-content h2 {
-            font-size: 1.875rem;
+            font-size: 1.25rem;
             font-weight: bold;
             margin: 1.5rem 0 0.875rem 0;
             color: #1f2937;

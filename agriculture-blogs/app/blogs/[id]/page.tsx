@@ -489,15 +489,7 @@ const handleCancelEdit = () => {
           >
           Log out
         </button>
-        <button
-  onClick={() => toggleLanguage(isUrdu ? 'en' : 'ur')}
-  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all border ${
-    isUrdu ? 'bg-green-600 text-white border-green-700' : 'bg-white text-zinc-700 border-zinc-200'
-  }`}
->
-  <Globe size={16} className={isUrdu ? "animate-spin" : ""} />
-  {isUrdu ? "En" : " اردو"} 
-</button>
+      
 
 {/* Yeh hidden hona chahiye Google Translate ke liye */}
 <div id="google_translate_element" style={{ display: 'none' }}></div>
@@ -509,9 +501,20 @@ const handleCancelEdit = () => {
       {/* Blog Header */}
       <header className="max-w-4xl mx-auto px-6 py-8 animate-fadeInUp" style={{animationDelay: "0.1s"}}>
         <div className="mb-6">
+           <div className="flex items-center gap-2">
           <span className="inline-block bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-bold mb-4 hover-lift">
             {blog?.category}
           </span>
+           <button
+          onClick={() => toggleLanguage(isUrdu ? 'en' : 'ur')}
+       className={`flex items-center gap-2 px-4 py-2 mb-4 border-none cursor-pointer rounded-full hover-lift text-sm font-bold transition-all border ${
+    isUrdu ? 'bg-green-100 text-green-700 border-none ' : ' bg-green-100 text-green-700'
+  }`}
+>
+   <Globe size={16} className={isUrdu ? "animate-spin" : ""} />
+  {isUrdu ? "en" : " ur"} 
+</button>
+           </div>
           <h1 dir="auto" className="text-5xl font-bold leading-tight mb-4 text-zinc-900 hover-lift transition-transform duration-300">
             {isUrdu? blog?.titleUrdu : blog?.title}
           </h1>
@@ -537,7 +540,7 @@ const handleCancelEdit = () => {
       
     <article className={`max-w-4xl mx-auto px-6 py-12 ${isUrdu ? 'urdu-mode' : 'english-mode'}`}>
   {/* 1. Google Translate Container (Isay hidden mat karein, bas small kar dein) */}
-  <div id="google_translate_element" style={{ opacity: 0, height: '1px', position: 'absolute' }}></div>
+  {/* <div id="google_translate_element" style={{ opacity: 0, height: '1px', position: 'absolute' }}></div> */}
   
   {/* 2. Content Div */}
   <div
