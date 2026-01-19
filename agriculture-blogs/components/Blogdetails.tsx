@@ -556,7 +556,7 @@ const handleCancelEdit = () => {
         </div>
       </section>
 
-      {/* Comments Section */}
+      {/* Comments Section helo */}
       {showCommentSection && (
       <section className="max-w-4xl mx-auto px-6 py-12 border-b border-zinc-200">
         <h3 className="text-2xl font-bold mb-6">Comments ({comments.length})</h3>
