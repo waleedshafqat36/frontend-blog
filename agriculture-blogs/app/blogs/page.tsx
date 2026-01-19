@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { Search, Send, ArrowRight, Facebook, Twitter, Instagram, Linkedin, X, ThumbsUp, Leaf } from 'lucide-react';
-import { FaThumbsUp } from 'react-icons/fa';
+import { FaFacebook, FaLinkedin, FaThumbsUp } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import { BsInstagram, BsTwitter } from 'react-icons/bs';
 
 interface Article {
   _id: string;
@@ -347,11 +348,14 @@ const otherPosts = [
       `}</style>
 
       {/* --- NAVBAR --- */}
-      <nav className="flex items-center justify-between px-8 md:px-16 py-4 max-w-7xl mx-auto animate-slideInLeft">
-        <div className="flex items-center gap-2 group">
-          <div className="w-8 h-8 bg-gradient-to-br from-green-600 to-green-700 rounded-full flex items-center justify-center text-white font-bold italic group-hover:scale-110 transition-transform duration-300">G</div>
-          <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">Agrob</span>
+      {/* <nav className="flex items-center justify-between px-8 md:px-16 py-4 max-w-7xl mx-auto animate-slideInLeft">
+        <div className="flex items-center gap-2 group cursor-pointer ">
+           <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold italic">
+            <img src="/Images/KissanMarket.jpg" alt="KissanMarket Logo" className="w-full h-full rounded-full object-contain" />
+          </div>
+          <span className="text-xl font-bold text-green-700">KissanMarket</span>
         </div>
+
         <div className="hidden md:flex gap-8 text-sm font-medium text-zinc-600">
           <a href="/" className="hover:text-green-600 transition duration-300 relative group">
             Home
@@ -386,7 +390,7 @@ const otherPosts = [
         >
           Log out
         </button>
-      </nav>
+      </nav> */}
 
       {/* --- HERO SECTION --- */}
     
@@ -531,48 +535,7 @@ const otherPosts = [
       </section>
 
       {/* --- FOOTER --- */}
-      <footer className="bg-gradient-to-b from-[#1a1f24] to-[#0d0f12] text-white pt-16 pb-8 px-8 md:px-16 mt-20">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-16 border-b border-zinc-800/50 pb-12">
-          <div className="animate-fadeInUp" style={{ animationDelay: '0s' }}>
-            <h4 className="font-bold mb-6 text-green-400">Company</h4>
-            <ul className="text-zinc-400 text-sm space-y-3">
-              <li className="hover:text-green-400 transition-colors duration-300 cursor-pointer">About Company</li>
-              <li className="hover:text-green-400 transition-colors duration-300 cursor-pointer">Terms of Service</li>
-              <li className="hover:text-green-400 transition-colors duration-300 cursor-pointer">Privacy Policy</li>
-              <li className="hover:text-green-400 transition-colors duration-300 cursor-pointer">Contact Us</li>
-            </ul>
-          </div>
-          <div className="animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
-            <h4 className="font-bold mb-6 text-green-400">Support</h4>
-            <ul className="text-zinc-400 text-sm space-y-3">
-              <li className="hover:text-green-400 transition-colors duration-300 cursor-pointer">Pricing</li>
-              <li className="hover:text-green-400 transition-colors duration-300 cursor-pointer">Help Center</li>
-              <li className="hover:text-green-400 transition-colors duration-300 cursor-pointer">What's New</li>
-              <li className="hover:text-green-400 transition-colors duration-300 cursor-pointer">Blog</li>
-            </ul>
-          </div>
-          <div className="md:col-span-2 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-            <h4 className="font-bold mb-6 text-green-400">Newsletter</h4>
-            <div className="relative max-w-md group">
-              <input 
-                type="text" 
-                placeholder="email@example.com" 
-                className="w-full bg-zinc-800/50 border border-zinc-700 group-hover:border-green-500 rounded-full py-4 px-6 text-sm outline-none transition-all duration-300 focus:border-green-500 focus:bg-zinc-800"
-              />
-              <button className="absolute right-2 top-2 bg-gradient-to-r from-green-600 to-green-700 p-2 rounded-full hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
-                <Send size={18} />
-              </button>
-            </div>
-            <div className="flex gap-4 mt-8">
-              <Facebook size={20} className="text-zinc-400 hover:text-green-400 hover:scale-110 cursor-pointer transition-all duration-300" />
-              <Twitter size={20} className="text-zinc-400 hover:text-green-400 hover:scale-110 cursor-pointer transition-all duration-300" />
-              <Instagram size={20} className="text-zinc-400 hover:text-green-400 hover:scale-110 cursor-pointer transition-all duration-300" />
-              <Linkedin size={20} className="text-zinc-400 hover:text-green-400 hover:scale-110 cursor-pointer transition-all duration-300" />
-            </div>
-          </div>
-        </div>
-        <p className="text-center text-zinc-600 text-xs mt-8 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>© 2026 Agrob. All Rights Reserved.</p>
-      </footer>
+    
 
       {/* --- MODAL --- */}
       {selectedArticle && (

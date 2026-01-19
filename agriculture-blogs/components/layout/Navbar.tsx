@@ -28,10 +28,10 @@ export default function Navbar() {
     <nav className="bg-white shadow-md">
       <div className="max-w-6xl mx-auto px-6 flex justify-between items-center py-4">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold italic">
-            G
+          <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold italic">
+            <img src="/Images/KissanMarket.jpg" alt="KissanMarket Logo" className="w-full h-full rounded-full object-contain" />
           </div>
-          <span className="text-xl font-bold text-green-700">Agrob</span>
+          <span className="text-xl font-bold text-green-700">KissanMarket</span>
         </div>
 
         {/* Desktop Menu */}
