@@ -2,7 +2,7 @@
 
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, Facebook, Twitter, Instagram, Linkedin, ThumbsUp, ThumbsDown, MessageCircle, Edit2, Trash2, Globe } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 
 import { FaFacebook, FaLinkedin, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
@@ -50,6 +50,7 @@ interface User {
 const BlogPost = ({slug} : Blog) => {
 
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
   const [trendingBlogs, setTrendingBlogs] = useState<Blog[]>([]);
@@ -74,20 +75,17 @@ const BlogPost = ({slug} : Blog) => {
   const [isUrdu, setIsUrdu] = useState(false)
     // console.log("Current slug is:", slug);
 
-const toggleLanguage = async (langCode: 'en' | 'ur') => {
-  // Pehle direction aur UI switch kar dein taake user ko foran response mile
-  setIsUrdu(langCode === 'ur');
+const toggleLanguage = (langCode: 'en' | 'ur') => {
+  startTransition(() => {
+    setIsUrdu(langCode === 'ur');
 
-  // Navigate to the corresponding slug if available
-  try {
+    // Navigate to the corresponding slug if available
     if (langCode === 'ur' && blog?.slugUrdu) {
       router.push(`/blogs/${blog?.slugUrdu}`, { scroll: false });
     } else if (langCode === 'en' && blog?.slug) {
       router.push(`/blogs/${blog?.slug}`, { scroll: false });
     }
-  } catch (err) {
-    console.warn('Navigation failed in toggleLanguage:', err);
-  }
+  });
 };
   useEffect(() => {
     if (isUrdu) {
