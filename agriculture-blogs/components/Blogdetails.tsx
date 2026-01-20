@@ -71,21 +71,20 @@ const BlogPost = ({slug} : Blog) => {
   const params = useParams();
   const blogId = params.id as string | string[] | undefined;
   const [isUrdu, setIsUrdu] = useState(false)
-    console.log("Current slug is:", slug);
+    // console.log("Current slug is:", slug);
 
-const toggleLanguage = async (langCode: 'en' | 'ur') => {
-  // Pehle direction aur UI switch kar dein taake user ko foran response mile
-  setIsUrdu(langCode === 'ur');
+const toggleLanguage = (langCode: 'en' | 'ur') => {
+  const newIsUrdu = langCode === 'ur';
+  
+  // 1. Pehle UI state change karein
+  setIsUrdu(newIsUrdu);
 
-  // Navigate to the corresponding slug if available
-  try {
-    if (langCode === 'ur' && blog?.slugUrdu) {
-      router.push(`/blogs/${blog?.slugUrdu}`, { scroll: false });
-    } else if (langCode === 'en' && blog?.slug) {
-      router.push(`/blogs/${blog?.slug}`, { scroll: false });
-    }
-  } catch (err) {
-    console.warn('Navigation failed in toggleLanguage:', err);
+  // 2. Slug check karein aur navigate karein
+  const targetSlug = newIsUrdu ? blog?.slugUrdu : blog?.slug;
+
+  if (targetSlug) {
+    // encodeURIComponent lazmi use karein Urdu slug ke liye
+    router.push(`/blogs/${encodeURIComponent(targetSlug)}`, { scroll: false });
   }
 };
   useEffect(() => {
@@ -184,7 +183,7 @@ const toggleLanguage = async (langCode: 'en' | 'ur') => {
     }
 
     fetchBlogDetails();
-  }, [blogId]);
+  }, [slug]);
 
   // Fetch trending articles (by likeCount) to show under Share section
   useEffect(() => {
