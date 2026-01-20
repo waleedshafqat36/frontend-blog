@@ -10,7 +10,7 @@ import { BsInstagram, BsTwitter, BsWhatsapp } from "react-icons/bs";
 
 interface Blog {
   _id: string;
-  slug:string;
+  slug?:string;
   slugUrdu?: string;
   title: string;
   titleUrdu?: string;
@@ -87,6 +87,13 @@ const toggleLanguage = (langCode: 'en' | 'ur') => {
     }
   });
 };
+useEffect(() => {
+  if (slug === blog?.slugUrdu) {
+    setIsUrdu(true);
+  } else {
+    setIsUrdu(false);
+  }
+}, [slug, blog])
   useEffect(() => {
     if (isUrdu) {
       document.documentElement.dir = "rtl";
@@ -157,7 +164,7 @@ const toggleLanguage = (langCode: 'en' | 'ur') => {
             setUserDisliked(data.detailsBlog.dislikedBy?.includes(userId) || false);
           }
           
-          // --- Related blogs fetch karein (Category ke base par) ---
+          // // --- Related blogs fetch karein (Category ke base par) ---
           if (data.detailsBlog.category && blogId) {
             fetchRelated(data.detailsBlog.category, blogId);
           }
