@@ -11,6 +11,7 @@ import { BsInstagram, BsTwitter, BsWhatsapp } from "react-icons/bs";
 interface Blog {
   _id: string;
   slug:string;
+  slugUrdu?: string;
   title: string;
   titleUrdu?: string;
   category: string;
@@ -73,20 +74,8 @@ const BlogPost = ({slug} : Blog) => {
   const [isUrdu, setIsUrdu] = useState(false)
     console.log("Current slug is:", slug);
 
-const toggleLanguage = async (langCode: 'en' | 'ur') => {
-  // Pehle direction aur UI switch kar dein taake user ko foran response mile
+const toggleLanguage = (langCode: 'en' | 'ur') => {
   setIsUrdu(langCode === 'ur');
-
-  // Navigate to the corresponding slug if available
-  try {
-    if (langCode === 'ur' && blog?.slugUrdu) {
-      router.push(`/blogs/${blog?.slugUrdu}`, { scroll: false });
-    } else if (langCode === 'en' && blog?.slug) {
-      router.push(`/blogs/${blog?.slug}`, { scroll: false });
-    }
-  } catch (err) {
-    console.warn('Navigation failed in toggleLanguage:', err);
-  }
 };
   useEffect(() => {
     if (isUrdu) {
