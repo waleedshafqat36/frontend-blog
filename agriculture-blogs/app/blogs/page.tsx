@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Search, Send, ArrowRight, Facebook, Twitter, Instagram, Linkedin, X, ThumbsUp, Leaf } from 'lucide-react';
-import { FaFacebook, FaLinkedin, FaThumbsUp } from 'react-icons/fa';
+import {  X, ThumbsUp } from 'lucide-react';
+import { FaThumbsUp } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
-import { BsInstagram, BsTwitter } from 'react-icons/bs';
+// import { BsInstagram, BsTwitter } from 'react-icons/bs';
 
 interface Article {
   _id: string;
@@ -422,6 +422,7 @@ const otherPosts = [
 
         <div className="grid md:grid-cols-4 gap-8 px-2 md:px-0">
           {articles.map((article, index) => (
+            
             <div 
               key={index} 
               className="group cursor-pointer card-loader px-3 py-2 rounded-2xl hover:bg-green-50/50 transition-all duration-300 relative"
@@ -434,7 +435,7 @@ const otherPosts = [
               <div className="absolute inset-0 bg-gradient-to-br from-green-200/0 to-green-100/0 group-hover:from-green-200/20 group-hover:to-green-100/20 rounded-2xl transition-all duration-500"></div>
               
               <div className="relative z-10">
-                <div className="overflow-hidden rounded-2xl mb-4 relative cursor-pointer group/image" onClick={() => router.push(`/blogs/${article?._id}`)}>
+                <div className="overflow-hidden rounded-2xl mb-4 relative cursor-pointer group/image" onClick={() => router.push(`/blogs/${article?.slug}`)}>
                   {/* Gradient overlay on hover */}
                   <div className="absolute inset-0 bg-gradient-to-br from-green-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
                   
@@ -463,7 +464,7 @@ const otherPosts = [
                 
                 <div className="flex items-center justify-between gap-4">
                   <button
-                    onClick={() => router.push(`/blogs/${article?._id}`)}
+                    onClick={() => router.push(`/blogs/${article?.slug}`)}
                     className="text-xs font-bold text-green-600 flex items-center gap-1 hover:text-green-700 hover:gap-2 transition-all duration-300 group/btn"
                   >
                     Learn More 

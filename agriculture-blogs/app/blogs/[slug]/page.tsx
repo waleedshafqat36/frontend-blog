@@ -4,18 +4,20 @@ import { Metadata } from 'next';
 import BlogPost from '@/components/Blogdetails';
 
 type Props = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
+  const { slug } = await params;
   
   // API se data fetch karein. 
   // Yaad rahe: Server-side par fetch ke liye poora URL dena parta hai (http://localhost:3000 ya domain)
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:300";
-  const res = await fetch(`${siteUrl}/api/blog/${id}`);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const res = await fetch(`${siteUrl}/api/blog/${slug}`);
   const data = await res.json();
   const blog = data.detailsBlog;
+  console.log("data",blog);
+  
 
   if (!blog) return { title: "Blog Not Found" };
 
@@ -28,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: blog.title,
       description: plainDescription,
-      url: `${siteUrl}/blog/${id}`,
+      url: `${siteUrl}/blog/${slug}`,
       siteName: 'Agrob',
       images: [
         {
@@ -42,6 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function Page() {
-  return <BlogPost />;
+export default async function Page({params}: Props) {
+  const {slug} = await params
+  return <BlogPost slug={slug} />;
 }

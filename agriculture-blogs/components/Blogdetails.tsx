@@ -4,66 +4,13 @@ import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, Facebook, Twitter, Instagram, Linkedin, ThumbsUp, ThumbsDown, MessageCircle, Edit2, Trash2, Globe } from "lucide-react";
 import { useEffect, useState } from "react";
 
-// Add animations to globals
-// const animationStyles = `
-//   @keyframes fadeInUp {
-//     from {
-//       opacity: 0;
-//       transform: translateY(20px);
-//     }
-//     to {
-//       opacity: 1;
-//       transform: translateY(0);
-//     }
-//   }
-  
-//   @keyframes slideInLeft {
-//     from {
-//       opacity: 0;
-//       transform: translateX(-20px);
-//     }
-//     to {
-//       opacity: 1;
-//       transform: translateX(0);
-//     }
-//   }
-  
-//   @keyframes scaleIn {
-//     from {
-//       opacity: 0;
-//       transform: scale(0.95);
-//     }
-//     to {
-//       opacity: 1;
-//       transform: scale(1);
-//     }
-//   }
-  
-//   .animate-fadeInUp {
-//     animation: fadeInUp 0.6s ease-out forwards;
-//   }
-  
-//   .animate-slideInLeft {
-//     animation: slideInLeft 0.5s ease-out forwards;
-//   }
-  
-//   .animate-scaleIn {
-//     animation: scaleIn 0.4s ease-out forwards;
-//   }
-  
-//   .hover-lift {
-//     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-//   }
-  
-//   .hover-lift:hover {
-//     transform: translateY(-4px);
-//   }
-// `;
+
 import { FaFacebook, FaLinkedin, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { BsInstagram, BsTwitter, BsWhatsapp } from "react-icons/bs";
 
 interface Blog {
   _id: string;
+  slug:string;
   title: string;
   titleUrdu?: string;
   category: string;
@@ -99,7 +46,8 @@ interface User {
   role: string;
 }
 
-const BlogPost = () => {
+const BlogPost = ({slug} : Blog) => {
+
   const router = useRouter();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
@@ -123,29 +71,22 @@ const BlogPost = () => {
   const params = useParams();
   const blogId = params.id as string | string[] | undefined;
   const [isUrdu, setIsUrdu] = useState(false)
+    console.log("Current slug is:", slug);
 
 const toggleLanguage = async (langCode: 'en' | 'ur') => {
   // Pehle direction aur UI switch kar dein taake user ko foran response mile
   setIsUrdu(langCode === 'ur');
 
-  const triggerGoogleTranslate = () => {
-    const selectElement = document.querySelector('.goog-te-combo') as HTMLSelectElement;
-    
-    if (selectElement) {
-      if (langCode === 'en') {
-        selectElement.value = ''; // Original English ke liye khali chordein
-      } else {
-        selectElement.value = 'ur';
-      }
-      selectElement.dispatchEvent(new Event('change', { bubbles: true }));
-    } else {
-      // Agar abhi tak load nahi hua, to 500ms baad phir try karein (sirf 3 baar)
-      console.log("Waiting for Google Translate to initialize...");
+  // Navigate to the corresponding slug if available
+  try {
+    if (langCode === 'ur' && blog?.slugUrdu) {
+      router.push(`/blogs/${blog?.slugUrdu}`, { scroll: false });
+    } else if (langCode === 'en' && blog?.slug) {
+      router.push(`/blogs/${blog?.slug}`, { scroll: false });
     }
-  };
-
-  // 1 second ka gap dein taake script init ho jaye agar pehle nahi hui
-  setTimeout(triggerGoogleTranslate, 500);
+  } catch (err) {
+    console.warn('Navigation failed in toggleLanguage:', err);
+  }
 };
   useEffect(() => {
     if (isUrdu) {
@@ -178,13 +119,13 @@ const toggleLanguage = async (langCode: 'en' | 'ur') => {
   }, []);
 
   useEffect(() => {
-    if (!blogId) return;
+    if (!slug) return;
 // fetch blog details from API
     const fetchBlogDetails = async () => {
       try {
-        const response = await fetch(`/api/blog/${blogId}`);
+        const response = await fetch(`/api/blog/${slug}`);
         const data = await response.json();
-        console.log(data);
+    
         
         if (response.ok) {
           // console.log("Blog data received:", data.detailsBlog);
@@ -252,8 +193,9 @@ const toggleLanguage = async (langCode: 'en' | 'ur') => {
         const res = await fetch(`/api/blog`);
         const data = await res.json();
         if (res.ok && Array.isArray(data.blogs)) {
-          const sorted = data.blogs.sort((a: any, b: any) => (b.likeCount || 0) - (a.likeCount || 0));
-          setTrendingBlogs(sorted.slice(0, 3));
+          // Only include blogs marked with SubCategory containing "Trending"
+          const filtered = data.blogs.filter((b: any) => Array.isArray(b.SubCategory) && b.SubCategory.includes("Trending"));
+          setTrendingBlogs(filtered.slice(0, 3));
         }
       } catch (err) {
         console.error("Trending fetch error", err);
@@ -423,10 +365,6 @@ const handleCancelEdit = () => {
     }
   }; 
    
-  // const handleLogout = () => {
-  //   localStorage.removeItem('user');
-  //   router.push('/auth/login');
-  // };
 
   if (!blog) {
     return (
@@ -526,7 +464,7 @@ const handleCancelEdit = () => {
               dir={isUrdu ? "rtl" : "ltr"}
               // Class name bhi dynamic honi chahiye
               className={`blog-content text-gray-700 leading-relaxed ${isUrdu ? 'urdu-text-style' : 'english-text-style'}`}
-              dangerouslySetInnerHTML={{ __html: isUrdu ? blog?.contentUrdu : blog?.content }}
+              dangerouslySetInnerHTML={{ __html: (isUrdu ? blog?.contentUrdu : blog?.content) || "" }}
             />
           </article>
 
@@ -542,7 +480,7 @@ const handleCancelEdit = () => {
                         key={index}
                         className="group cursor-pointer border border-zinc-200 rounded-lg overflow-hidden hover:shadow-md transition-all hover-lift bg-white animate-scaleIn"
                         style={{animationDelay: `${0.7 + index * 0.1}s`}}
-                        onClick={() => router.push(`/blogs/${related?._id}`)}
+                        onClick={() => router.push(`/blogs/${related?.slug}`)}
                       >
                         <img
                           src={related?.image}
@@ -780,8 +718,8 @@ const handleCancelEdit = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {trendingBlogs.map((t, idx) => (
                 <div
-                  key={t._id}
-                  onClick={() => router.push(`/blogs/${t._id}`)}
+                  key={idx}
+                  onClick={() => router.push(`/blogs/${t.slug}`)}
                   className="cursor-pointer border border-zinc-200 rounded-lg overflow-hidden hover:shadow-md transition-all hover-lift bg-white"
                 >
                   <img src={t.image} alt={t.title} className="w-full h-28 object-cover" />

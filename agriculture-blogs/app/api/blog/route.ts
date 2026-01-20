@@ -1,5 +1,6 @@
 import cloudinary from "@/lib/cloudinary";
 import ConnectDB from "@/lib/db";
+import { genSlug, genUrduSlug } from "@/lib/slugGen";
 import Blog from "@/models/blog";
 import { log } from "console";
 import { NextResponse } from "next/server";
@@ -36,10 +37,11 @@ export async function GET() {
     let contentUrdu = toStr('contentUrdu')
     let author = toStr('author')
     let category = toStr('category')
+    let subCategory = toStr('SubCategory')
     let content = toStr('content')
     const file = formData.get("image") as File | null;
 
-    console.log("Received data:", { title, titleUrdu, author, category, content: content?.slice?.(0,120), contentUrdu: contentUrdu?.slice?.(0,120), fileName: file?.name });
+    // console.log("Received data:", { title, titleUrdu, author, category, content: content?.slice?.(0,120), contentUrdu: contentUrdu?.slice?.(0,120), fileName: file?.name });
 
     if (!file) {
       return NextResponse.json({ message: "Image is missing" }, { status: 400 });
@@ -84,14 +86,22 @@ export async function GET() {
       content = ''
     }
 
-    console.log('Storing to DB:', { title: title.slice(0,60), titleUrdu: titleUrdu.slice(0,60), content: content.slice(0,60), contentUrdu: contentUrdu.slice(0,60) });
+    // console.log('Storing to DB:', { title: title.slice(0,60), titleUrdu: titleUrdu.slice(0,60), content: content.slice(0,60), contentUrdu: contentUrdu.slice(0,60) });
+  // Slug implementation
+  const slugSource = title ;
+  const slugSourceUrdu = titleUrdu ;
 
+  const newSlug = genSlug(slugSource)
+  const urduSlug = genUrduSlug(slugSourceUrdu)
     // 3. Database Entry
     const blog = await Blog.create({
       title,
+      slug:newSlug,
       titleUrdu,
+      slugUrdu:urduSlug,
       author,
       category,
+      SubCategory: subCategory ? [subCategory] : [],
       content,
       contentUrdu,
       image: uploadResponse.secure_url // Cloudinary link

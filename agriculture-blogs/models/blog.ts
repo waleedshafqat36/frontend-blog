@@ -25,6 +25,14 @@ const blogSchema = new mongoose.Schema({
     required: [true, "Blog title is required"],
     trim: true
   },
+  slug:{
+     type : String,
+     unique:true
+  },
+  slugUrdu: {
+     type: String,
+     unique: true
+     },
   titleUrdu: { type: String, required: true },
   author: {
     type: String,
@@ -65,10 +73,14 @@ const blogSchema = new mongoose.Schema({
   comments: {
     type: [commentSchema],
     default: []
+  },
+  SubCategory: {
+    type: [String],
+    default: []
   }
 }, { 
   timestamps: true 
 });
 
-const Blog = mongoose.models.Blogs || mongoose.model("Blogs", blogSchema);
+const Blog = mongoose.models.Blog || mongoose.model("Blog", blogSchema);
 export default Blog;
