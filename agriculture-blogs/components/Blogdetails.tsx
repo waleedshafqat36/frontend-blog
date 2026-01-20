@@ -2,7 +2,7 @@
 
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, Facebook, Twitter, Instagram, Linkedin, ThumbsUp, ThumbsDown, MessageCircle, Edit2, Trash2, Globe } from "lucide-react";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 
 import { FaFacebook, FaLinkedin, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
@@ -10,7 +10,7 @@ import { BsInstagram, BsTwitter, BsWhatsapp } from "react-icons/bs";
 
 interface Blog {
   _id: string;
-  slug?:string;
+  slug:string;
   slugUrdu?: string;
   title: string;
   titleUrdu?: string;
@@ -21,6 +21,7 @@ interface Blog {
   content: string;
   contentUrdu?: string;
   likeCount?: number;
+  dislikeCount?: number;
   likedBy?: string[];
   dislikedBy?: string[];
   likes?: string[];
@@ -47,10 +48,9 @@ interface User {
   role: string;
 }
 
-const BlogPost = ({slug} : Blog) => {
+const BlogPost = ({ blog: initialBlog }: { blog: Blog }) => {
 
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
   const [trendingBlogs, setTrendingBlogs] = useState<Blog[]>([]);
@@ -72,28 +72,12 @@ const BlogPost = ({slug} : Blog) => {
   const [commentDislikes, setCommentDislikes] = useState<{[key: string]: boolean}>({});
   const params = useParams();
   const blogId = params.id as string | string[] | undefined;
-  const [isUrdu, setIsUrdu] = useState(false)
-    // console.log("Current slug is:", slug);
+  const [isUrdu, setIsUrdu] = useState(false);
 
-const toggleLanguage = (langCode: 'en' | 'ur') => {
-  startTransition(() => {
+  const toggleLanguage = useCallback((langCode: 'en' | 'ur') => {
     setIsUrdu(langCode === 'ur');
+  }, []);
 
-    // Navigate to the corresponding slug if available
-    if (langCode === 'ur' && blog?.slugUrdu) {
-      router.push(`/blogs/${blog?.slugUrdu}`, { scroll: false });
-    } else if (langCode === 'en' && blog?.slug) {
-      router.push(`/blogs/${blog?.slug}`, { scroll: false });
-    }
-  });
-};
-useEffect(() => {
-  if (slug === blog?.slugUrdu) {
-    setIsUrdu(true);
-  } else {
-    setIsUrdu(false);
-  }
-}, [slug, blog])
   useEffect(() => {
     if (isUrdu) {
       document.documentElement.dir = "rtl";
@@ -101,6 +85,7 @@ useEffect(() => {
       document.documentElement.dir = "ltr";
     }
   }, [isUrdu]);
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -124,73 +109,60 @@ useEffect(() => {
     }
   }, []);
 
-  useEffect(() => {
-    if (!slug) return;
-// fetch blog details from API
-    const fetchBlogDetails = async () => {
-      try {
-        const response = await fetch(`/api/blog/${slug}`);
-        const data = await response.json();
-    
-        
-        if (response.ok) {
-          // console.log("Blog data received:", data.detailsBlog);
-          setBlog(data.detailsBlog);
-          setLikes(data.detailsBlog.likeCount || 0);
-          setDislikes(data.detailsBlog.dislikeCount || 0);
-          
-          // Properly set comments from database
-          const blogComments = data.detailsBlog.comments || [];
-          setComments(blogComments);
-          // console.log("Comments loaded:", blogComments);
-          
-          // Initialize comment likes/dislikes based on current user
-          if (userId && blogComments.length > 0) {
-            const likedCommentsMap: {[key: string]: boolean} = {};
-            const dislikedCommentsMap: {[key: string]: boolean} = {};
-            
-            blogComments.forEach((comment: Comment) => {
-              likedCommentsMap[comment._id] = comment.likedBy?.includes(userId) || false;
-              dislikedCommentsMap[comment._id] = comment.dislikedBy?.includes(userId) || false;
-            });
-            
-            setCommentLikes(likedCommentsMap);
-            setCommentDislikes(dislikedCommentsMap);
-          }
-          
-          // Check if current user has liked or disliked
-          if (userId) {
-            setUserLiked(data.detailsBlog.likedBy?.includes(userId) || false);
-            setUserDisliked(data.detailsBlog.dislikedBy?.includes(userId) || false);
-          }
-          
-          // // --- Related blogs fetch karein (Category ke base par) ---
-          if (data.detailsBlog.category && blogId) {
-            fetchRelated(data.detailsBlog.category, blogId);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching blog details:", error);
-      }
-    };
-// Related blogs fetch karne ka function
-    const fetchRelated = async (category: string, currentId: string | string[]) => {
-        try {
-            const res = await fetch(`/api/blog`); 
-            const data = await res.json();
-          console.log("data", data);
-          
-            if (res.ok) {
-                const filtered = data.blogs.filter((b: Blog) => b._id !== currentId && b.category === category);
-                setRelatedBlogs(filtered.slice(0, 3));
-            }
-        } catch (err) {
-            console.log("Related fetch error", err);
-        }
-    }
+  // Related blogs fetch karne ka function
+  const fetchRelated = useCallback(async (category: string, currentId: string) => {
+    try {
+      const res = await fetch(`/api/blog`);
+      const data = await res.json();
+      console.log("data", data);
 
-    fetchBlogDetails();
-  }, [slug]);
+      if (res.ok) {
+        const filtered = data.blogs.filter((b: Blog) => b._id !== currentId && b.category === category);
+        setRelatedBlogs(filtered.slice(0, 3));
+      }
+    } catch (err) {
+      console.log("Related fetch error", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!initialBlog) return;
+    
+    // Set the blog from props immediately
+    setBlog(initialBlog);
+    setLikes(initialBlog.likeCount || 0);
+    setDislikes(initialBlog.dislikeCount || 0);
+    
+    // Properly set comments from database
+    const blogComments = initialBlog.comments || [];
+    setComments(blogComments);
+    // console.log("Comments loaded:", blogComments);
+    
+    // Initialize comment likes/dislikes based on current user
+    if (userId && blogComments.length > 0) {
+      const likedCommentsMap: {[key: string]: boolean} = {};
+      const dislikedCommentsMap: {[key: string]: boolean} = {};
+      
+      blogComments.forEach((comment: Comment) => {
+        likedCommentsMap[comment._id] = comment.likedBy?.includes(userId) || false;
+        dislikedCommentsMap[comment._id] = comment.dislikedBy?.includes(userId) || false;
+      });
+      
+      setCommentLikes(likedCommentsMap);
+      setCommentDislikes(dislikedCommentsMap);
+    }
+    
+    // Check if current user has liked or disliked
+    if (userId) {
+      setUserLiked(initialBlog.likedBy?.includes(userId) || false);
+      setUserDisliked(initialBlog.dislikedBy?.includes(userId) || false);
+    }
+    
+    // --- Related blogs fetch karein (Category ke base par) ---
+    if (initialBlog.category && initialBlog._id) {
+      fetchRelated(initialBlog.category, initialBlog._id);
+    }
+  }, [initialBlog._id, userId, fetchRelated]);
 
   // Fetch trending articles (by likeCount) to show under Share section
   useEffect(() => {
@@ -210,8 +182,9 @@ useEffect(() => {
 
     fetchTrending();
   }, []);
+
 // Like/Dislike handlers
-  const handleLikeDislike = async (action: "like" | "dislike") => {
+  const handleLikeDislike = useCallback(async (action: "like" | "dislike") => {
     if (!userId || !blogId) return;
 
     try {
@@ -234,9 +207,10 @@ useEffect(() => {
     } catch (error) {
       console.error("Error:", error);
     }
-  };
+  }, [userId, blogId]);
+
 // Add Comment handler
-  const handleAddComment = async (e: React.FormEvent) => {
+  const handleAddComment = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     const authorName = user?.name || "Anonymous";
     if (!commentText.trim() || !authorName.trim() || !blogId) return;
@@ -265,7 +239,7 @@ useEffect(() => {
     } finally {
       setIsLoadingComment(false);
     }
-  };
+  }, [commentText, blogId, user]);
   // Edit Comment handlers
   const handleEditComment = (id: string, author: string, text: string) => {
   setEditingCommentId(id);

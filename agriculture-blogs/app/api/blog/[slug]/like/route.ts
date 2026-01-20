@@ -2,9 +2,9 @@ import ConnectDB from "@/lib/db";
 import Blog from "@/models/blog";
 import { NextResponse } from "next/server";
 
-export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
-    const { id } = await params;
+    const { slug } = await params;
     const { userId, action } = await req.json(); // action: "like" or "dislike"
 
     if (!userId || !action) {
@@ -16,7 +16,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     await ConnectDB();
 
-    const blog = await Blog.findById(id);
+    const blog = await Blog.findOne({ slug: slug });
     if (!blog) {
       return NextResponse.json({ message: "Blog not found" }, { status: 404 });
     }
@@ -71,8 +71,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       }
     }
 
-    // Execute the update with $inc operator
-    let updatedBlog = await Blog.findByIdAndUpdate(id, updateQuery, { new: true });
+    // Execute the update using findOneAndUpdate with slug
+    let updatedBlog = await Blog.findOneAndUpdate(
+      { slug: slug },
+      updateQuery,
+      { new: true }
+    );
 
     // Ensure counts never go below 0
     if (updatedBlog) {

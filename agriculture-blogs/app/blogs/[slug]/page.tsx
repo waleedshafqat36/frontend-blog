@@ -1,7 +1,6 @@
-// app/blog/[id]/page.tsx
+// app/blog/[slug]/page.tsx
 import { Metadata } from 'next';
-//  Aapka wo "use client" wala component
-import BlogPost from '@/components/Blogdetails';
+import BlogPost from '@/components/BlogdetailsServer';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -10,18 +9,13 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   
-  // API se data fetch karein. 
-  // Yaad rahe: Server-side par fetch ke liye poora URL dena parta hai (http://localhost:3000 ya domain)
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const res = await fetch(`${siteUrl}/api/blog/${slug}`);
   const data = await res.json();
   const blog = data.detailsBlog;
 
-  
-
   if (!blog) return { title: "Blog Not Found" };
 
-  // HTML content se plain text nikalne ke liye regex (agar content HTML mein hai)
   const plainDescription = blog.content.replace(/<[^>]*>/g, '').substring(0, 160);
 
   return {
@@ -46,5 +40,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({params}: Props) {
   const {slug} = await params
-  return <BlogPost slug={slug} />;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const res = await fetch(`${siteUrl}/api/blog/${slug}`);
+  const data = await res.json();
+  const blog = data.detailsBlog;
+  
+  return <BlogPost blog={blog} />;
 }

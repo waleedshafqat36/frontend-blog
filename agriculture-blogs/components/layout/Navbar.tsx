@@ -12,6 +12,7 @@ interface User {
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [isUrdu, setIsUrdu] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -22,6 +23,19 @@ export default function Navbar() {
         console.error("Error parsing user from localStorage:", error);
       }
     }
+
+    // Check if page is in RTL (Urdu) mode
+    const checkLanguage = () => {
+      setIsUrdu(document.documentElement.dir === "rtl");
+    };
+    
+    checkLanguage();
+    
+    // Listen for direction changes
+    const observer = new MutationObserver(checkLanguage);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["dir"] });
+    
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -36,18 +50,18 @@ export default function Navbar() {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex gap-8 text-sm font-medium text-zinc-600">
-          <a href="/" className="hover:text-green-600">Home</a>
-          <a href="#" className="hover:text-green-600">About</a>
-          <a href="/blogs" className="hover:text-green-600">Blogs</a>
-          <a href="#" className="hover:text-green-600">Service</a>
-          <a href="#" className="hover:text-green-500">Contact</a>
+          <a href="/" className="hover:text-green-600">{isUrdu ? "ہوم" : "Home"}</a>
+          <a href="#" className="hover:text-green-600">{isUrdu ? "ہمارے بارے میں" : "About"}</a>
+          <a href="/blogs" className="hover:text-green-600">{isUrdu ? "بلاگز" : "Blogs"}</a>
+          <a href="#" className="hover:text-green-600">{isUrdu ? "خدمات" : "Service"}</a>
+          <a href="#" className="hover:text-green-500">{isUrdu ? "رابطہ کریں" : "Contact"}</a>
           {user?.role === 'admin' && (
-            <a href="/Admin" className="hover:text-green-500">Admin</a>
+            <a href="/Admin" className="hover:text-green-500">{isUrdu ? "ایڈمن" : "Admin"}</a>
           )}
         </div>
 
-        <a href="/auth/login" className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-full text-sm font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
-          Log out
+        <a href="/auth/login" className="bg-linear-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-full text-sm font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
+          {isUrdu ? "لاگ آؤٹ" : "Log out"}
         </a>
 
         {/* Mobile Menu Button */}
@@ -61,9 +75,9 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {open && (
         <div className="md:hidden bg-white px-6 pb-4 flex flex-col space-y-3">
-          <a href="/" className="hover:text-blue-500">Home</a>
-          <a href="/blogs" className="hover:text-blue-500">Blog</a>
-          <a href="/auth/login" className="hover:text-blue-500">Logout</a>
+          <a href="/" className="hover:text-blue-500">{isUrdu ? "ہوم" : "Home"}</a>
+          <a href="/blogs" className="hover:text-blue-500">{isUrdu ? "بلاگز" : "Blog"}</a>
+          <a href="/auth/login" className="hover:text-blue-500">{isUrdu ? "لاگ آؤٹ" : "Logout"}</a>
         </div>
       )}
     </nav>

@@ -14,6 +14,8 @@ interface Article {
   fullContent: string;
   likeCount?: number;
   likedBy?: string[];
+  createdAt?: string;
+  slug?: string;
 }
 
 interface User {
@@ -183,7 +185,7 @@ const otherPosts = [
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-green-50 to-white font-sans text-zinc-900">
+    <div className="min-h-screen bg-linear-to-b from-white via-green-50 to-white font-sans text-zinc-900">
       {/* Animated background gradient */}
       <style>{`
         @keyframes float {
@@ -356,7 +358,7 @@ const otherPosts = [
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
         
         {/* Left Side: Main Featured Post */}
-    <div className="lg:col-span-2 relative group cursor-pointer overflow-hidden rounded-2xl h-[450px]">
+    <div className="lg:col-span-2 relative group cursor-pointer overflow-hidden rounded-2xl h-112.5">
   {/* Agriculture Image */}
   <img 
     src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?q=80&w=1200" 
@@ -365,7 +367,7 @@ const otherPosts = [
   />
   
   {/* Dark Overlay with Gradient */}
-  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-8">
+  <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-8">
     
     {/* Category Tag */}
     <span className="bg-green-600/40 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full w-fit mb-4 border border-green-400/30">
@@ -390,7 +392,7 @@ const otherPosts = [
           <div className="flex flex-col gap-5">
             {otherPosts.map((post) => (
               <div key={post.id} className="flex gap-4 items-center group cursor-pointer">
-                <div className="flex-shrink-0 w-24 h-16 overflow-hidden rounded-xl">
+                <div className="shrink-0 w-24 h-16 overflow-hidden rounded-xl">
                   <img 
                     src={post.img} 
                     alt={post.title} 
@@ -411,10 +413,10 @@ const otherPosts = [
       {/* --- TRENDING ARTICLES --- */}
       <section className="max-w-7xl mx-auto px-8 md:px-16 py-16">
         <div className="mb-12 animate-fadeInUp">
-          <h2 className="text-4xl font-bold mb-2 bg-gradient-to-r from-green-700 to-green-600 bg-clip-text text-transparent animate-slideUp hover:scale-105 transition-transform duration-300 inline-block">
+          <h2 className="text-4xl font-bold mb-2 bg-linear-to-r from-green-700 to-green-600 bg-clip-text text-transparent animate-slideUp hover:scale-105 transition-transform duration-300 inline-block">
             Our Trending Articles
           </h2>
-          <div className="h-1 w-20 bg-gradient-to-r from-green-600 to-green-400 rounded-full animate-grow"></div>
+          <div className="h-1 w-20 bg-linear-to-r from-green-600 to-green-400 rounded-full animate-grow"></div>
           <p className="text-zinc-500 text-sm mt-4 max-w-2xl animate-slideUp" style={{animationDelay: '0.2s'}}>
             Discover the latest insights and trends in sustainable agriculture. Explore expert articles on farming, agri-tech, and organic solutions.
           </p>
@@ -432,12 +434,12 @@ const otherPosts = [
               }}
             >
               {/* Glow background effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-green-200/0 to-green-100/0 group-hover:from-green-200/20 group-hover:to-green-100/20 rounded-2xl transition-all duration-500"></div>
+              <div className="absolute inset-0 bg-linear-to-br from-green-200/0 to-green-100/0 group-hover:from-green-200/20 group-hover:to-green-100/20 rounded-2xl transition-all duration-500"></div>
               
               <div className="relative z-10">
                 <div className="overflow-hidden rounded-2xl mb-4 relative cursor-pointer group/image" onClick={() => router.push(`/blogs/${article?.slug}`)}>
                   {/* Gradient overlay on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-green-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
+                  <div className="absolute inset-0 bg-linear-to-br from-green-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
                   
                   <img 
                     src={article?.image || ''} 
@@ -449,7 +451,7 @@ const otherPosts = [
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-all duration-300 rounded-2xl"></div>
                   
                   {/* Featured badge with animation */}
-                  <div className="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-105 shadow-lg">
+                  <div className="absolute top-3 right-3 bg-linear-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-105 shadow-lg">
                     Featured
                   </div>
                 </div>
@@ -471,21 +473,13 @@ const otherPosts = [
                     <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center text-[10px] group-hover/btn:bg-green-600 group-hover/btn:text-white transition-all duration-300 transform group-hover/btn:scale-110">✓</div>
                   </button>
                   
-                  <button
-                    onClick={(e) => handleLike(article._id, e)}
-                    className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 transform hover:scale-110 ${
-                      userLikedArticles.has(article._id)
-                        ? "bg-green-100 text-green-700 shadow-md animate-bounce-subtle"
-                        : "bg-gray-100 text-gray-400 hover:bg-green-50 hover:text-green-600"
-                    }`}
-                  >
-                    {userLikedArticles.has(article._id) ? (
-                      <FaThumbsUp size={14} />
-                    ) : (
-                      <ThumbsUp size={14} />
-                    )}
-                    <span>{articleLikes[article._id] || 0}</span>
-                  </button>
+                  <div className="flex items-center bg-green-200 gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-600">
+                    {article.createdAt ? new Date(article.createdAt).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    }) : 'Date unavailable'}
+                  </div>
                 </div>
               </div>
             </div>

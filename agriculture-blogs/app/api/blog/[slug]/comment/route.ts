@@ -4,9 +4,9 @@ import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 
 
-export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
-    const { id } = await params;
+    const { slug } = await params;
     const { author, text, authorId } = await req.json();
 
     if (!author || !text) {
@@ -18,7 +18,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     await ConnectDB();
 
-    const blog = await Blog.findById(id);
+    const blog = await Blog.findOne({ slug: slug });
     
     if (!blog) {
       return NextResponse.json({ message: "Blog not found" }, { status: 404 });
@@ -40,7 +40,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     await blog.save();
 
     // Convert to plain object to ensure proper serialization
-    const updatedBlog = await Blog.findById(id).lean();
+    const updatedBlog = await Blog.findOne({ slug: slug }).lean();
 
     return NextResponse.json(
       {
@@ -59,13 +59,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   }
 }
 
-export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
-    const { id } = await params;
+    const { slug } = await params;
 
     await ConnectDB();
 
-    const blog = await Blog.findById(id).lean();
+    const blog = await Blog.findOne({ slug: slug }).lean();
     if (!blog) {
       return NextResponse.json({ message: "Blog not found" }, { status: 404 });
     }
@@ -86,15 +86,15 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   }
 }
 // Updated code ends here
-export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
-  const { id } = await params;
+  const { slug } = await params;
   const {commentId, text} = await req.json();
   console.log("Updating comment:", commentId, text);
   
   await ConnectDB();
 
-  const blog = await Blog.findById(id);
+  const blog = await Blog.findOne({ slug: slug });
   if (!blog) {
     return NextResponse.json({ message: "Blog not found" }, { status: 404 });
   }
@@ -117,9 +117,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
-    const { id } = await params;
+    const { slug } = await params;
     const { commentId } = await req.json();
 
     if (!commentId) {
@@ -131,7 +131,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 
     await ConnectDB();
 
-    const blog = await Blog.findById(id);
+    const blog = await Blog.findOne({ slug: slug });
     if (!blog) {
       return NextResponse.json({ message: "Blog not found" }, { status: 404 });
     }
@@ -144,7 +144,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     blog.comments.splice(commentIndex, 1);
     await blog.save();
 
-    const updatedBlog = await Blog.findById(id).lean();
+    const updatedBlog = await Blog.findOne({ slug: slug }).lean();
 
     return NextResponse.json(
       {

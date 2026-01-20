@@ -4,10 +4,10 @@ import { NextResponse } from "next/server";
 
 export async function POST(
   req: Request,
-  { params }: { params: Promise<{ id: string; commentId: string }> }
+  { params }: { params: Promise<{ slug: string; commentId: string }> }
 ) {
   try {
-    const { id, commentId } = await params;
+    const { slug, commentId } = await params;
     const { userId, action } = await req.json();
 
     if (!userId || !action) {
@@ -19,7 +19,7 @@ export async function POST(
 
     await ConnectDB();
 
-    const blog = await Blog.findById(id);
+    const blog = await Blog.findOne({ slug: slug });
     if (!blog) {
       return NextResponse.json({ message: "Blog not found" }, { status: 404 });
     }
