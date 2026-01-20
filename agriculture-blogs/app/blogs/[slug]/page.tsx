@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const res = await fetch(`${siteUrl}/api/blog/${slug}`);
   const data = await res.json();
   const blog = data.detailsBlog;
-  console.log("data",blog);
+
   
 
   if (!blog) return { title: "Blog Not Found" };
