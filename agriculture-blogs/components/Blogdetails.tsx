@@ -5,71 +5,76 @@ import { ArrowLeft, Facebook, Twitter, Instagram, Linkedin, ThumbsUp, ThumbsDown
 import { useEffect, useState } from "react";
 
 // Add animations to globals
-const animationStyles = `
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+// const animationStyles = `
+//   @keyframes fadeInUp {
+//     from {
+//       opacity: 0;
+//       transform: translateY(20px);
+//     }
+//     to {
+//       opacity: 1;
+//       transform: translateY(0);
+//     }
+//   }
   
-  @keyframes slideInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
+//   @keyframes slideInLeft {
+//     from {
+//       opacity: 0;
+//       transform: translateX(-20px);
+//     }
+//     to {
+//       opacity: 1;
+//       transform: translateX(0);
+//     }
+//   }
   
-  @keyframes scaleIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
+//   @keyframes scaleIn {
+//     from {
+//       opacity: 0;
+//       transform: scale(0.95);
+//     }
+//     to {
+//       opacity: 1;
+//       transform: scale(1);
+//     }
+//   }
   
-  .animate-fadeInUp {
-    animation: fadeInUp 0.6s ease-out forwards;
-  }
+//   .animate-fadeInUp {
+//     animation: fadeInUp 0.6s ease-out forwards;
+//   }
   
-  .animate-slideInLeft {
-    animation: slideInLeft 0.5s ease-out forwards;
-  }
+//   .animate-slideInLeft {
+//     animation: slideInLeft 0.5s ease-out forwards;
+//   }
   
-  .animate-scaleIn {
-    animation: scaleIn 0.4s ease-out forwards;
-  }
+//   .animate-scaleIn {
+//     animation: scaleIn 0.4s ease-out forwards;
+//   }
   
-  .hover-lift {
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
+//   .hover-lift {
+//     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+//   }
   
-  .hover-lift:hover {
-    transform: translateY(-4px);
-  }
-`;
+//   .hover-lift:hover {
+//     transform: translateY(-4px);
+//   }
+// `;
 import { FaFacebook, FaLinkedin, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { BsInstagram, BsTwitter, BsWhatsapp } from "react-icons/bs";
 
 interface Blog {
   _id: string;
   title: string;
+  titleUrdu?: string;
   category: string;
   author: string;
   createdAt: string;
   image: string;
   content: string;
+  contentUrdu?: string;
+  likeCount?: number;
+  likedBy?: string[];
+  dislikedBy?: string[];
   likes?: string[];
   dislikes?: string[];
   comments?: Comment[];
@@ -98,6 +103,7 @@ const BlogPost = () => {
   const router = useRouter();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
+  const [trendingBlogs, setTrendingBlogs] = useState<Blog[]>([]);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const [userLiked, setUserLiked] = useState(false);
@@ -238,6 +244,24 @@ const toggleLanguage = async (langCode: 'en' | 'ur') => {
 
     fetchBlogDetails();
   }, [blogId]);
+
+  // Fetch trending articles (by likeCount) to show under Share section
+  useEffect(() => {
+    const fetchTrending = async () => {
+      try {
+        const res = await fetch(`/api/blog`);
+        const data = await res.json();
+        if (res.ok && Array.isArray(data.blogs)) {
+          const sorted = data.blogs.sort((a: any, b: any) => (b.likeCount || 0) - (a.likeCount || 0));
+          setTrendingBlogs(sorted.slice(0, 3));
+        }
+      } catch (err) {
+        console.error("Trending fetch error", err);
+      }
+    };
+
+    fetchTrending();
+  }, []);
 // Like/Dislike handlers
   const handleLikeDislike = async (action: "like" | "dislike") => {
     if (!userId || !blogId) return;
@@ -399,10 +423,10 @@ const handleCancelEdit = () => {
     }
   }; 
    
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    router.push('/auth/login');
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem('user');
+  //   router.push('/auth/login');
+  // };
 
   if (!blog) {
     return (
@@ -527,7 +551,7 @@ const handleCancelEdit = () => {
                         />
                         <div className="p-2.5">
                           <h4 className="font-semibold text-xs mb-1.5 group-hover:text-green-600 transition-colors duration-300 line-clamp-2">
-                            {related?.title}
+                            {isUrdu ? related?.titleUrdu || related?.title : related?.title}
                           </h4>
                           <p className="text-zinc-500 text-[11px]">
                             {related?.createdAt && new Date(related.createdAt).toLocaleDateString()}
@@ -748,10 +772,39 @@ const handleCancelEdit = () => {
 
       </section>
       )}
+      {/* Trending Articles (shown below Share section) */}
+      <section className="max-w-4xl mx-auto px-6 py-12 border-b border-zinc-200 animate-fadeInUp" style={{animationDelay: "0.7s"}}>
+        <h3 className="text-xl font-bold mb-6">Trending Articles</h3>
+        <div className="space-y-3">
+          {trendingBlogs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {trendingBlogs.map((t, idx) => (
+                <div
+                  key={t._id}
+                  onClick={() => router.push(`/blogs/${t._id}`)}
+                  className="cursor-pointer border border-zinc-200 rounded-lg overflow-hidden hover:shadow-md transition-all hover-lift bg-white"
+                >
+                  <img src={t.image} alt={t.title} className="w-full h-28 object-cover" />
+                  <div className="p-3">
+                    <h4 className="font-semibold text-sm line-clamp-2">{isUrdu ? (t as any).titleUrdu || t.title : t.title}</h4>
+                    <p className="text-zinc-500 text-xs mt-1">{t.createdAt && new Date(t.createdAt).toLocaleDateString()}</p>
+                    <div className="text-zinc-600 text-xs mt-2 flex items-center gap-2">
+                      <ThumbsUp size={14} />
+                      <span>{(t as any).likeCount || 0}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-zinc-500 text-sm">No trending articles found.</p>
+          )}
+        </div>
+      </section>
 
       {/* Share Section */}
       <section className="max-w-4xl mx-auto px-6 py-12 border-b border-zinc-200 mt-0 animate-fadeInUp" style={{animationDelay: "0.6s"}}>
-  <h3 className="text-xl font-bold mb-6">Share This Article</h3>
+  <h3 className="text-xl  font-bold mb-6">Share This Article</h3>
   <div className="flex gap-4">
     {/* Facebook */}
     <a 
@@ -794,6 +847,8 @@ const handleCancelEdit = () => {
     </a>
   </div>
 </section>
+
+      
 
       {/* Related Articles Section - REMOVED (now in sidebar on right) */}
 
