@@ -464,7 +464,7 @@ const handleCancelEdit = () => {
   }`}
 >
    <Globe size={16} className={isUrdu ? "animate-spin" : ""} />
-  {isUrdu ? "en" : " ur"} 
+  {isUrdu ? "English" : "اردو"} 
 </button>
            </div>
           <h1 dir="auto" className="text-5xl font-bold leading-tight mb-4 text-zinc-900 hover-lift transition-transform duration-300">
@@ -488,26 +488,66 @@ const handleCancelEdit = () => {
         />
       </header>
 
-      {/* Blog Content */}
-      
-    <article className={`max-w-4xl mx-auto px-6 py-12 ${isUrdu ? 'urdu-mode' : 'english-mode'}`}>
-  {/* 1. Google Translate Container (Isay hidden mat karein, bas small kar dein) */}
-  {/* <div id="google_translate_element" style={{ opacity: 0, height: '1px', position: 'absolute' }}></div> */}
-  
-  {/* 2. Content Div */}
-  <div
-    // 'dir' state ke mutabiq switch hoga taake alignment foran badal jaye
-    dir={isUrdu ? "rtl" : "ltr"}
-    // Class name bhi dynamic honi chahiye
-    className={`blog-content text-gray-700 leading-relaxed ${isUrdu ? 'urdu-text-style' : 'english-text-style'}`}
-    dangerouslySetInnerHTML={{ __html: isUrdu ? blog?.contentUrdu : blog?.content }}
-  />
-</article>
+      {/* Blog Content with Sidebar */}
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Main Content - Left Side (3 columns) */}
+          <article className={`lg:col-span-3 pl-15 ${isUrdu ? 'urdu-mode' : 'english-mode'}`}>
+            {/* 1. Google Translate Container (Isay hidden mat karein, bas small kar dein) */}
+            {/* <div id="google_translate_element" style={{ opacity: 0, height: '1px', position: 'absolute' }}></div> */}
+            
+            {/* 2. Content Div */}
+            <div
+              // 'dir' state ke mutabiq switch hoga taake alignment foran badal jaye
+              dir={isUrdu ? "rtl" : "ltr"}
+              // Class name bhi dynamic honi chahiye
+              className={`blog-content text-gray-700 leading-relaxed ${isUrdu ? 'urdu-text-style' : 'english-text-style'}`}
+              dangerouslySetInnerHTML={{ __html: isUrdu ? blog?.contentUrdu : blog?.content }}
+            />
+          </article>
 
+          {/* Related Articles Sidebar - Right Side (1 column) */}
+          <aside className="lg:col-span-1 pl-4">
+            <div className="sticky top-8">
+              <div className="border border-zinc-200 rounded-xl p-4 bg-zinc-50">
+                <h3 className="text-base font-bold mb-4 text-zinc-900">Related Articles</h3>
+                <div className="space-y-3">
+                  {relatedBlogs.length > 0 ? (
+                    relatedBlogs.slice(0, 3).map((related, index) => (
+                      <div
+                        key={index}
+                        className="group cursor-pointer border border-zinc-200 rounded-lg overflow-hidden hover:shadow-md transition-all hover-lift bg-white animate-scaleIn"
+                        style={{animationDelay: `${0.7 + index * 0.1}s`}}
+                        onClick={() => router.push(`/blogs/${related?._id}`)}
+                      >
+                        <img
+                          src={related?.image}
+                          alt={related?.title}
+                          className="w-full h-24 object-cover group-hover:scale-110 transition-transform duration-300"
+                        />
+                        <div className="p-2.5">
+                          <h4 className="font-semibold text-xs mb-1.5 group-hover:text-green-600 transition-colors duration-300 line-clamp-2">
+                            {related?.title}
+                          </h4>
+                          <p className="text-zinc-500 text-[11px]">
+                            {related?.createdAt && new Date(related.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-zinc-500 text-xs text-center py-3">No related articles found.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
 
       {/* Like/Dislike Section */}
-      <section className="max-w-4xl mx-auto px-6 py-8 border-b border-zinc-200 animate-fadeInUp" style={{animationDelay: "0.4s"}}>
-        <div className="flex items-center justify-between">
+      <section className="max-w-4xl ml-22 px-6 py-8 border-b border-zinc-200 animate-fadeInUp" style={{animationDelay: "0.4s"}}>
+        <div className="flex items-start justify-between gap-6">
           <p className="text-zinc-600 text-sm font-semibold">Was this article helpful?</p>
           <div className="flex items-center gap-3">
             <button
@@ -755,39 +795,7 @@ const handleCancelEdit = () => {
   </div>
 </section>
 
-      {/* Related Articles Section */}
-     {/* Related Articles Section - Updated Logic */}
-      <section className="max-w-4xl mx-auto px-6 py-12 border-t border-zinc-200 animate-fadeInUp" style={{animationDelay: "0.7s"}}>
-        <h3 className="text-2xl font-bold mb-8">Related Articles</h3>
-        <div className="grid md:grid-cols-3 gap-6">
-          {relatedBlogs.length > 0 ? (
-            relatedBlogs.map((related, index) => (
-              <div
-                key={index}
-                className="group cursor-pointer border border-zinc-200 rounded-lg overflow-hidden hover:shadow-xl transition-all hover-lift animate-scaleIn"
-                style={{animationDelay: `${0.7 + index * 0.1}s`}}
-                onClick={() => router.push(`/blogs/${related?._id}`)}
-              >
-                <img
-                  src={related?.image}
-                  alt={related?.title}
-                  className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-                <div className="p-4">
-                  <h4 className="font-bold text-lg mb-2 group-hover:text-green-600 transition-colors duration-300">
-                    {related?.title}
-                  </h4>
-                  <p className="text-zinc-600 text-sm">
-                    {related?.createdAt && new Date(related.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-zinc-500">No related articles found.</p>
-          )}
-        </div>
-      </section>
+      {/* Related Articles Section - REMOVED (now in sidebar on right) */}
 
       {/* Footer */}
       <footer className="bg-[#1a1f24] text-white pt-16 pb-8 px-6 mt-16 animate-fadeInUp" style={{animationDelay: "0.8s"}}>
