@@ -348,49 +348,7 @@ const otherPosts = [
       `}</style>
 
       {/* --- NAVBAR --- */}
-      {/* <nav className="flex items-center justify-between px-8 md:px-16 py-4 max-w-7xl mx-auto animate-slideInLeft">
-        <div className="flex items-center gap-2 group cursor-pointer ">
-           <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold italic">
-            <img src="/Images/KissanMarket.jpg" alt="KissanMarket Logo" className="w-full h-full rounded-full object-contain" />
-          </div>
-          <span className="text-xl font-bold text-green-700">KissanMarket</span>
-        </div>
-
-        <div className="hidden md:flex gap-8 text-sm font-medium text-zinc-600">
-          <a href="/" className="hover:text-green-600 transition duration-300 relative group">
-            Home
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
-          </a>
-          <a href="/blogs" className="hover:text-green-600 transition duration-300 relative group">
-            Blogs
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
-          </a>
-          <a href="#" className="hover:text-green-600 transition duration-300 relative group">
-            About
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
-          </a>
-          <a href="#" className="hover:text-green-600 transition duration-300 relative group">
-            Service
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
-          </a>
-          <a href="#" className="hover:text-green-500 transition duration-300 relative group">
-            Contact
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
-          </a>
-          {user?.role === 'admin' && (
-            <a href="/Admin" className="hover:text-green-500 transition duration-300 relative group">
-              Admin
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
-            </a>
-          )}
-        </div>
-        <button 
-          onClick={handleLogout}
-          className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-full text-sm font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
-        >
-          Log out
-        </button>
-      </nav> */}
+     
 
       {/* --- HERO SECTION --- */}
     
