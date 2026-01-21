@@ -3,8 +3,8 @@
 import { Globe } from "lucide-react";
 import { useState, useMemo, useCallback, ReactNode } from "react";
 import React from "react";
-import TrendingArticles from "./TrendingArticles";
 import BlogImage from "./BlogImage";
+import TrendingArticles from "./TrendingArticles";
 
 interface BlogContent {
   _id: string;
@@ -121,7 +121,11 @@ const RelatedArticlesSidebar = React.memo(function RelatedArticlesSidebar({
                       </h4>
                       <p className="text-xs text-zinc-500 mt-1">{relatedBlog.category}</p>
                       <p className="text-xs text-zinc-400 mt-1">
-                        {relatedBlog.createdAt && new Date(relatedBlog.createdAt).toLocaleDateString()}
+                        {relatedBlog.createdAt && new Date(relatedBlog.createdAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
                       </p>
                     </div>
                   </div>
@@ -216,7 +220,7 @@ export default function BlogLanguageToggle({
         {childrenWithProps}
 
         {/* Trending Articles Section */}
-        <TrendingArticles trendingBlogs={trendingBlogs} isUrdu={isUrdu} />
+        <TrendingArticles trendingBlogs={trendingBlogs} isUrdu={isUrdu} limit={3} />
       </div>
     </>
   );

@@ -1,7 +1,7 @@
 import { ThumbsUp, ArrowRight } from "lucide-react";
 import BlogInteractiveWrapper from "./BlogInteractiveWrapper";
 import BlogLanguageToggle from "./BlogLanguageToggle";
-import TrendingArticles from "./TrendingArticles";
+import { ReactNode } from "react";
 
 interface Blog {
   _id: string;
@@ -30,8 +30,7 @@ async function getRelatedBlogs(category: string, currentId: string) {
     const data = await res.json();
     const filtered = data.blogs.filter((b: Blog) => 
       b._id !== currentId && 
-      b.category === category && 
-      !(Array.isArray(b.SubCategory) && b.SubCategory.includes("Trending"))
+      b.category === category
     );
     return filtered.slice(0, 3);
   } catch (err) {
@@ -43,17 +42,16 @@ async function getRelatedBlogs(category: string, currentId: string) {
 async function getTrendingBlogs() {
   try {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-    const res = await fetch(`${siteUrl}/api/blog`);
+    const res = await fetch(`${siteUrl}/api/blog/trending`);
     const data = await res.json();
-    const filtered = data.blogs.filter((b: any) => Array.isArray(b.SubCategory) && b.SubCategory.includes("Trending"));
-    return filtered.slice(0, 3);
+    return data.blogs ? data.blogs.slice(0, 6) : [];
   } catch (err) {
     console.error("Trending fetch error", err);
     return [];
   }
 }
 
-export default async function BlogPost({ blog: initialBlog }: { blog: Blog }) {
+export default async function BlogPost({ blog: initialBlog }: { blog: Blog }): Promise<ReactNode> {
   if (!initialBlog) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">

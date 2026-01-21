@@ -37,6 +37,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     }
 
     blog.comments.push(newComment);
+    blog.commentCount = (blog.commentCount || 0) + 1; // Increment commentCount
     await blog.save();
 
     // Convert to plain object to ensure proper serialization
@@ -46,7 +47,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
       {
         success: true,
         comment: newComment,
-        comments: updatedBlog?.comments || []
+        comments: updatedBlog?.comments || [],
+        commentCount: updatedBlog?.commentCount || 0
       },
       { status: 200 }
     );
@@ -142,6 +144,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ slug:
     }
 
     blog.comments.splice(commentIndex, 1);
+    blog.commentCount = Math.max(0, (blog.commentCount || 0) - 1); // Decrement commentCount
     await blog.save();
 
     const updatedBlog = await Blog.findOne({ slug: slug }).lean();
@@ -150,7 +153,8 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ slug:
       {
         success: true,
         message: "Comment deleted successfully",
-        comments: updatedBlog?.comments || []
+        comments: updatedBlog?.comments || [],
+        commentCount: updatedBlog?.commentCount || 0
       },
       { status: 200 }
     );

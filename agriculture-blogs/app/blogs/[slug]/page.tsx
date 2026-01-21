@@ -39,11 +39,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({params}: Props) {
-  const {slug} = await params
+  const {slug} = await params;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const res = await fetch(`${siteUrl}/api/blog/${slug}`);
   const data = await res.json();
   const blog = data.detailsBlog;
   
-  return <BlogPost blog={blog} />;
+  return await BlogPost({ blog });
 }

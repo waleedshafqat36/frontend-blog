@@ -74,6 +74,21 @@ const blogSchema = new mongoose.Schema({
     type: [commentSchema],
     default: []
   },
+  commentCount: {
+    type: Number,
+    default: 0,
+    index: true // Index for faster sorting
+  },
+  viewCount: {
+    type: Number,
+    default: 0,
+    index: true // Index for faster sorting
+  },
+  shareCount: {
+    type: Number,
+    default: 0,
+    index: true // Index for faster sorting
+  },
   SubCategory: {
     type: [String],
     default: []

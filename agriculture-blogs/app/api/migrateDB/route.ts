@@ -18,3 +18,27 @@ export async function GET(){
     return Response.json({ message: `${blogs.length} blogs updated with slugs!` });
 
 }
+
+export async function POST(){
+    await ConnectDB();
+    
+    // Sync commentCount with actual comments array
+    const blogs = await Blog.find({});
+    
+    const syncPromises = blogs.map(async (blog) => {
+        const actualCommentCount = blog.comments ? blog.comments.length : 0;
+        if (blog.commentCount !== actualCommentCount) {
+            blog.commentCount = actualCommentCount;
+            console.log(`Synced ${blog.slug}: commentCount updated to ${actualCommentCount}`);
+            return await blog.save();
+        }
+        return blog;
+    });
+    
+    await Promise.all(syncPromises);
+    
+    return Response.json({ 
+        message: `${blogs.length} blogs synced with correct comment counts!`,
+        blogs: blogs.length 
+    });
+}

@@ -11,12 +11,27 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
     
     const detailsBlog = await Blog.findOne({$or: [{ slug: slug }, { slugUrdu: slug }]}).lean();
    
-    
-
     if (!detailsBlog) {
       console.log("❌ DB mein ye slug nahi mila:", slug);
       console.log("Blog not found for ID:", slug); // Server console mein check karein
       return NextResponse.json({ success: false, message: "Blog not found" }, { status: 404 });
+    }
+
+    // Ensure commentCount matches actual comments array
+    const actualCommentCount = detailsBlog.comments ? detailsBlog.comments.length : 0;
+    if (detailsBlog.commentCount !== actualCommentCount) {
+      detailsBlog.commentCount = actualCommentCount;
+    }
+
+    // Increment viewCount
+    try {
+      await Blog.updateOne(
+        { _id: detailsBlog._id },
+        { $inc: { viewCount: 1 } }
+      );
+    } catch (error) {
+      console.error("Error updating viewCount:", error);
+      // Continue anyway, don't fail the request
     }
 
     return NextResponse.json({ success: true, detailsBlog }, { status: 200 });
@@ -24,5 +39,3 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
     return NextResponse.json({ success: false, message: "Invalid ID format" }, { status: 500 });
   }
 }
-
-  

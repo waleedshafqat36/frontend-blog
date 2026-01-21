@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
-import { ArrowLeft, Facebook, Twitter, Instagram, Linkedin, ThumbsUp, ThumbsDown, MessageCircle, Edit2, Trash2, Globe } from "lucide-react";
+import { ArrowLeft, Facebook, Twitter, Instagram, Linkedin, ThumbsUp, ThumbsDown, MessageCircle, Edit2, Trash2, Globe, Share2 } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
 
 
@@ -73,6 +73,8 @@ const BlogPost = ({ blog: initialBlog }: { blog: Blog }) => {
   const params = useParams();
   const blogId = params.id as string | string[] | undefined;
   const [isUrdu, setIsUrdu] = useState(false);
+  const [lastFetchedLikes, setLastFetchedLikes] = useState(0);
+  const [showShareMenu, setShowShareMenu] = useState(false);
 
   const toggleLanguage = useCallback((langCode: 'en' | 'ur') => {
     setIsUrdu(langCode === 'ur');
@@ -183,6 +185,29 @@ const BlogPost = ({ blog: initialBlog }: { blog: Blog }) => {
     fetchTrending();
   }, []);
 
+  // Poll for updated likes from other users every 3 seconds
+  useEffect(() => {
+    if (!initialBlog?.slug) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/blog/${initialBlog.slug}`);
+        const data = await res.json();
+        
+        if (res.ok && data.detailsBlog) {
+          const updatedBlog = data.detailsBlog;
+          // Update likes and dislikes from database
+          setLikes(updatedBlog.likeCount || 0);
+          setDislikes(updatedBlog.dislikeCount || 0);
+        }
+      } catch (err) {
+        console.error("Error polling for updates:", err);
+      }
+    }, 3000); // Poll every 3 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [initialBlog?.slug]);
+
 // Like/Dislike handlers
   const handleLikeDislike = useCallback(async (action: "like" | "dislike") => {
     if (!userId || !blogId) return;
@@ -208,6 +233,44 @@ const BlogPost = ({ blog: initialBlog }: { blog: Blog }) => {
       console.error("Error:", error);
     }
   }, [userId, blogId]);
+
+// Share handler
+  const handleShare = useCallback((platform: string) => {
+    if (typeof window === 'undefined') return;
+    
+    const url = window.location.href;
+    const title = initialBlog?.title || "Check out this article";
+    const shareText = `${title} - ${url}`;
+    
+    let shareUrl = '';
+    
+    switch(platform) {
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        break;
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
+        break;
+      case 'linkedin':
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+        break;
+      case 'whatsapp':
+        shareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+        break;
+      case 'copy':
+        navigator.clipboard.writeText(url);
+        alert('Link copied to clipboard!');
+        setShowShareMenu(false);
+        return;
+      default:
+        return;
+    }
+    
+    if (shareUrl) {
+      window.open(shareUrl, '_blank', 'width=600,height=400');
+      setShowShareMenu(false);
+    }
+  }, [initialBlog?.title]);
 
 // Add Comment handler
   const handleAddComment = useCallback(async (e: React.FormEvent) => {
@@ -387,6 +450,7 @@ const handleCancelEdit = () => {
         .animate-fadeIn { animation: fadeIn 0.5s ease-out forwards; }
         .hover-lift { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .hover-lift:hover { transform: translateY(-4px); }
+        .urdu-mode { margin-right: 3rem; }
       `}</style>
       
 
@@ -449,7 +513,7 @@ const handleCancelEdit = () => {
           </article>
 
           {/* Related Articles Sidebar - Right Side (1 column) */}
-          <aside className="lg:col-span-1 pl-4">
+          <aside className="lg:col-span-1 pl-4 ">
             <div className="sticky top-8">
               <div className="border border-zinc-200 rounded-xl p-4 bg-zinc-50">
                 <h3 className="text-base font-bold mb-4 text-zinc-900">Related Articles</h3>
@@ -534,6 +598,62 @@ const handleCancelEdit = () => {
               <MessageCircle size={16} />
               <span>{comments.length}</span>
             </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowShareMenu(!showShareMenu)}
+                className={`flex items-center gap-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all transform hover:scale-110 ${
+                  showShareMenu
+                    ? "bg-purple-100 text-purple-700 shadow-md"
+                    : "bg-gray-100 text-gray-400 hover:bg-purple-50 hover:text-purple-600"
+                }`}
+                title="Share this article"
+              >
+                <Share2 size={16} />
+                <span>Share</span>
+              </button>
+              
+              {/* Share Menu Dropdown */}
+              {showShareMenu && (
+                <div className="absolute top-full right-0 mt-2 bg-white border border-zinc-200 rounded-lg shadow-lg z-50 py-2 w-48 animate-fadeInUp">
+                  <button
+                    onClick={() => handleShare('facebook')}
+                    className="w-full px-4 py-2 flex items-center gap-3 hover:bg-blue-50 transition text-left text-sm"
+                  >
+                    <FaFacebook size={16} className="text-blue-600" />
+                    <span>Share on Facebook</span>
+                  </button>
+                  <button
+                    onClick={() => handleShare('twitter')}
+                    className="w-full px-4 py-2 flex items-center gap-3 hover:bg-sky-50 transition text-left text-sm"
+                  >
+                    <BsTwitter size={16} className="text-sky-500" />
+                    <span>Share on Twitter</span>
+                  </button>
+                  <button
+                    onClick={() => handleShare('linkedin')}
+                    className="w-full px-4 py-2 flex items-center gap-3 hover:bg-blue-50 transition text-left text-sm"
+                  >
+                    <FaLinkedin size={16} className="text-blue-700" />
+                    <span>Share on LinkedIn</span>
+                  </button>
+                  <button
+                    onClick={() => handleShare('whatsapp')}
+                    className="w-full px-4 py-2 flex items-center gap-3 hover:bg-green-50 transition text-left text-sm"
+                  >
+                    <BsWhatsapp size={16} className="text-green-500" />
+                    <span>Share on WhatsApp</span>
+                  </button>
+                  <hr className="my-2" />
+                  <button
+                    onClick={() => handleShare('copy')}
+                    className="w-full px-4 py-2 flex items-center gap-3 hover:bg-gray-50 transition text-left text-sm"
+                  >
+                    <span className="text-lg">🔗</span>
+                    <span>Copy Link</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>

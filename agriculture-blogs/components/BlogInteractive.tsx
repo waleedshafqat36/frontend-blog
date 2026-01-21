@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { ThumbsUp, ThumbsDown, MessageCircle, Edit2, Trash2 } from "lucide-react";
+import { ThumbsUp, ThumbsDown, MessageCircle, Edit2, Trash2, Share2 } from "lucide-react";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
 interface Comment {
@@ -299,6 +299,31 @@ export default function BlogInteractive({ blogId, initialLikes = 0, initialDisli
             >
               <MessageCircle size={16} />
               <span>{comments.length}</span>
+            </button>
+            <button
+              onClick={async () => {
+                if (navigator.share) {
+                  try {
+                    await navigator.share({
+                      title: document.title,
+                      url: typeof window !== 'undefined' ? window.location.href : '',
+                    });
+                  } catch (error) {
+                    console.log('Share cancelled or failed:', error);
+                  }
+                } else {
+                  // Fallback: copy URL to clipboard
+                  const url = typeof window !== 'undefined' ? window.location.href : '';
+                  navigator.clipboard.writeText(url).then(() => {
+                    alert('Link copied to clipboard!');
+                  });
+                }
+              }}
+              className="flex items-center gap-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all transform hover:scale-110 bg-gray-100 text-gray-400 hover:bg-purple-50 hover:text-purple-600"
+              title={isUrdu ? "اس مضمون کو شیئر کریں" : "Share this article"}
+            >
+              <Share2 size={16} />
+              <span>{isUrdu ? "شیئر" : "Share"}</span>
             </button>
           </div>
         </div>
