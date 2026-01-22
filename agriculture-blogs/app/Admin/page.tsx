@@ -16,7 +16,6 @@ const AddBlogForm = () => {
   })
   const [user, setUserName] = useState<string>("")
 const [isUrdu, setIsUrdu] = useState(false);
-  const [isTrending, setIsTrending] = useState(false);
   const [image, setImage] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -104,10 +103,6 @@ const [isUrdu, setIsUrdu] = useState(false);
     data.append("isUrdu", String(isUrdu))
     data.append("author", formData.author) // Author from logged-in user
     data.append("category", formData.category)
-    // Add Trending subcategory if admin checked the box
-    if (isTrending) {
-      data.append("SubCategory", "Trending")
-    }
     data.append("content", englishContent)
     if (image) data.append("image", image)
 
@@ -432,22 +427,7 @@ const [isUrdu, setIsUrdu] = useState(false);
     </div>
   </div>
 
-  {/* TRENDING CHECKBOX */}
-  <div className="relative z-10 space-y-3">
-    <label className="flex items-center gap-3 text-sm font-bold text-slate-600">
-      <input
-        type="checkbox"
-        checked={isTrending}
-        onChange={(e) => setIsTrending(e.target.checked)}
-        className="w-4 h-4"
-      />
-      <span className="uppercase tracking-wider">Mark as Trending</span>
-    </label>
-    <p className="text-[11px] text-slate-400">When checked, this post will be added to the "Trending" subcategory.</p>
-  </div>
 
-  {/* DIVIDER */}
-  <div className="relative z-10 h-px bg-slate-100 w-full"></div>
 
   {/* PUBLISH BUTTON */}
   <div className="relative z-10 pt-2">

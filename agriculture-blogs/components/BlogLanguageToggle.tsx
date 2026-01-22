@@ -51,7 +51,7 @@ const BlogHeader = React.memo(function BlogHeader({
             {isUrdu ? "English" : "اردو"}
           </button>
         </div>
-        <h1 dir="auto" className="text-5xl font-bold leading-tight mb-4 text-zinc-900 hover-lift transition-transform duration-300">
+        <h1 dir="auto" className="text-3xl font-bold leading-tight mb-4 text-zinc-900 hover-lift transition-transform duration-300">
           {isUrdu ? blog?.titleUrdu || blog?.title : blog?.title}
         </h1>
         <div className="flex items-center gap-4 text-zinc-600 text-sm" style={{}}>
@@ -158,7 +158,14 @@ export default function BlogLanguageToggle({
   trendingBlogs = [], 
   children 
 }: BlogLanguageToggleProps) {
-  const [isUrdu, setIsUrdu] = useState(false);
+  // Read language preference from localStorage, default to Urdu
+  const [isUrdu, setIsUrdu] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const preference = localStorage.getItem('blogLanguagePreference');
+      return preference === 'english' ? false : true;
+    }
+    return true;
+  });
 
   const handleToggleLanguage = useCallback(() => {
     setIsUrdu(prev => {

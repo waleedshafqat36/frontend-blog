@@ -1,4 +1,3 @@
-
 import BlogInteractiveWrapper from "./BlogInteractiveWrapper";
 import BlogLanguageToggle from "./BlogLanguageToggle";
 import { ReactNode } from "react";

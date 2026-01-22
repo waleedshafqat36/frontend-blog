@@ -10,7 +10,9 @@ interface Article {
   _id: string;
   image: string;
   title: string;
+  titleUrdu?: string;
   content: string;
+  contentUrdu?: string;
   fullContent: string;
   likeCount?: number;
   likedBy?: string[];
@@ -36,6 +38,7 @@ const AgricultureBlog = () => {
   const [userLikedArticles, setUserLikedArticles] = useState<Set<string>>(new Set());
   const [loadedCards, setLoadedCards] = useState<Set<string>>(new Set());
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isUrdu, setIsUrdu] = useState(true);
   const router = useRouter();
 
   const truncateContent = (content: string, maxLength: number = 100) => {
@@ -155,6 +158,11 @@ const AgricultureBlog = () => {
     
     fetchArticles();
   }, []);
+
+  // Save language preference to localStorage
+  useEffect(() => {
+    localStorage.setItem('blogLanguagePreference', isUrdu ? 'urdu' : 'english');
+  }, [isUrdu]);
 
 
 
@@ -351,64 +359,115 @@ const AgricultureBlog = () => {
       {/* <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8"> */}
         
       {/* --- TRENDING ARTICLES --- */}
-<section className="max-w-7xl mx-auto px-6 py-20">
+<section className="max-w-7xl mx-auto px-6 py-2">
   {/* Centered Header Section */}
-  <div className="mb-20 flex flex-col items-center text-center animate-fadeInUp">
-    <span className="text-green-600 font-black tracking-[0.3em] text-[10px] uppercase mb-4">
-      Expert Analysis
-    </span>
-    <h2 className="text-5xl md:text-5xl font-black mb-6 tracking-tighter text-zinc-900 leading-none">
-      Trending <span className="text-green-600 italic">Insights.</span>
+  <div className="mb-8 flex flex-col animate-fadeInUp">
+    
+    <h2 className="text-4xl md:text-4xl font-black mb-6 tracking-tighter text-zinc-900 leading-none">
+      BLOGS <span className="text-green-600 ">MARKET</span>
     </h2>
-    <div className="h-1 w-20 bg-green-600 rounded-full animate-grow"></div>
+    
+    {/* Language Toggle Buttons */}
+    <div className="flex items-center gap-3 mb-8">
+      <button 
+        onClick={() => setIsUrdu(false)}
+        className={`px-6 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${
+          !isUrdu 
+            ? 'bg-green-600 text-white shadow-lg' 
+            : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+        }`}
+      >
+        English
+      </button>
+      <button 
+        onClick={() => setIsUrdu(true)}
+        className={`px-6 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${
+          isUrdu 
+            ? 'bg-green-600 text-white shadow-lg' 
+            : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+        }`}
+      >
+        اردو
+      </button>
+    </div>
   </div>
 
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-start">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-start" dir={isUrdu ? "rtl" : "ltr"}>
   {articles.map((article, index) => (
     <div 
        onClick={()=>router.push(`/blogs/${article?.slug}`)}
       key={index} 
-      className="group cursor-pointer flex flex-col bg-white rounded-[1.5rem] overflow-hidden border border-zinc-100 hover:shadow-xl transition-all duration-500 h-auto"
+      className="group cursor-pointer flex flex-col bg-white rounded-xl overflow-hidden border border-zinc-100 hover:shadow-lg transition-all duration-500 h-auto"
     >
       {/* 1. Controlled Image Height */}
-      <div className="relative h-48 overflow-hidden shrink-0">
+      <div className="relative h-32 overflow-hidden shrink-0">
         <img 
      
           src={article?.image || ''} 
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           alt={article?.title}
         />
-        <div className="absolute top-3 left-3">
-          <span className="bg-white px-3 py-1 text-[10px] hover:text-white hover:bg-green-600 rounded-2xl font-black uppercase tracking-widest shadow-sm">
-            {article?.category || 'Agriculture'}
-          </span>
-        </div>
       </div>
 
       {/* 2. Natural Content Flow (No flex-grow) */}
-      <div className="p-5 flex flex-col">
-        <div className="flex items-center gap-2 mb-2 text-[9px] font-bold text-zinc-400 uppercase tracking-widest">
+      <div className="p-3 flex flex-col" dir={isUrdu ? "rtl" : "ltr"}>
+        <div className="flex items-center gap-2 mb-1.5 text-[8px] font-bold text-zinc-400 uppercase tracking-widest">
           <span>{article.author || 'Bilal'}</span>
-          <span className="w-1 h-1 bg-zinc-200 rounded-full"></span>
-          <span>Jan 22</span>
+          <span className="w-0.5 h-0.5 bg-zinc-200 rounded-full"></span>
+          <span>
+            {article.createdAt 
+              ? new Date(article.createdAt).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'short', 
+                  day: 'numeric' 
+                })
+              : 'Jan 22'}
+          </span>
         </div>
 
-        <h3 className="text-xl font-extrabold mb-2 leading-tight text-zinc-900 group-hover:text-green-600 transition-colors line-clamp-2">
-          {article?.title || "Beekeeping: A Sweet Source..."}
+        <h3 className={`text-sm font-bold mb-1.5 leading-tight text-zinc-900 group-hover:text-green-600 transition-colors line-clamp-2 ${isUrdu ? 'text-base' : ''}`} style={isUrdu ? {   fontFamily: "'Jameel Noori Nastaleeq', serif", } : {}}>
+          {isUrdu ? (article?.titleUrdu || article?.title) : article?.title}
         </h3>
-        
-        <p className="text-zinc-500 text-xs mb-5 leading-relaxed line-clamp-2">
-          {article?.content?.replace(/<[^>]*>/g, '').slice(0, 80)}...
+
+        <p className={`text-zinc-500 text-[10px] mb-3 leading-relaxed line-clamp-2 ${isUrdu ? 'text-sm' : ''}`} style={isUrdu ? {   fontFamily: "'Jameel Noori Nastaleeq', serif", } : {}}>
+          {isUrdu 
+            ? (article?.contentUrdu?.replace(/<[^>]*>/g, '').slice(0, 80) || article?.content?.replace(/<[^>]*>/g, '').slice(0, 80))
+            : article?.content?.replace(/<[^>]*>/g, '').slice(0, 80)}...
         </p>
 
         {/* 3. Action Button close to content */}
-        <div className="pt-4 border-t border-zinc-50 flex items-center justify-between">
-          <button className="text-[10px] font-black uppercase tracking-widest text-zinc-900 flex items-center gap-2 group/btn">
-            Read Article
-            <div className="w-7 h-7 rounded-full border border-zinc-200 flex items-center justify-center group-hover/btn:bg-zinc-900 group-hover/btn:text-white transition-all">
-              <ChevronRight size={12} />
-            </div>
-          </button>
+        <div className="pt-2 border-t border-zinc-50 flex items-center justify-between">
+         <button
+  className="
+    group/btn
+    inline-flex items-center gap-1.5
+    text-xs font-medium
+    text-zinc-700
+    px-2.5 py-1.5
+    rounded-full
+    border border-zinc-300
+    bg-white
+    hover:bg-zinc-900 hover:text-white
+    transition-all duration-300
+  "
+>
+  Read more
+  <span
+    className="
+      w-4 h-4
+      rounded-full
+      border border-zinc-300
+      flex items-center justify-center
+      group-hover/btn:border-white
+      group-hover/btn:bg-white
+      group-hover/btn:text-zinc-900
+      transition-all duration-300
+    "
+  >
+    <ChevronRight size={10} />
+  </span>
+</button>
+
         </div>
       </div>
     </div>

@@ -97,5 +97,5 @@ const blogSchema = new mongoose.Schema({
   timestamps: true 
 });
 
-const Blog = mongoose.models.detail || mongoose.model("detail", blogSchema);
+const Blog = mongoose.models.detailblogs || mongoose.model("detailblogs", blogSchema);
 export default Blog;

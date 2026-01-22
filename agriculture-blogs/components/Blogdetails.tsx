@@ -1,5 +1,3 @@
-"use client";
-
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, Facebook, Twitter, Instagram, Linkedin, ThumbsUp, ThumbsDown, MessageCircle, Edit2, Trash2, Globe, Share2 } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
@@ -72,7 +70,7 @@ const BlogPost = ({ blog: initialBlog }: { blog: Blog } ) => {
   const [commentDislikes, setCommentDislikes] = useState<{[key: string]: boolean}>({});
   const params = useParams();
   const blogId = params.id as string | string[] | undefined;
-  const [isUrdu, setIsUrdu] = useState(false);
+  const [isUrdu, setIsUrdu] = useState(true);
   // const [lastFetchedLikes, setLastFetchedLikes] = useState(0);
   const [showShareMenu, setShowShareMenu] = useState(false);
 
@@ -81,10 +79,10 @@ const BlogPost = ({ blog: initialBlog }: { blog: Blog } ) => {
   const toggleLanguage = useCallback((langCode: 'en' | 'ur') => {
     setIsUrdu(langCode === 'ur');
     if (langCode === "ur" && blog?.slugUrdu) {
-    router.push(`/blog/${blog.slugUrdu}`); 
+    router.push(`/blogs/${blog.slugUrdu}`); 
   } 
   else if (langCode === "en" && blog?.slug) {
-    router.push(`/blog/${blog.slug}`);
+    router.push(`/blogs/${blog.slug}`);
   }
   }, [blog, router]);
 
@@ -95,6 +93,18 @@ const BlogPost = ({ blog: initialBlog }: { blog: Blog } ) => {
       document.documentElement.dir = "ltr";
     }
   }, [isUrdu]);
+
+  useEffect(() => {
+    // Detect if we're on Urdu slug by comparing with blog slugs
+    if (blog && blogId) {
+      const slugStr = Array.isArray(blogId) ? blogId[0] : blogId;
+      if (blog.slugUrdu && slugStr === blog.slugUrdu) {
+        setIsUrdu(true);
+      } else if (blog.slug && slugStr === blog.slug) {
+        setIsUrdu(false);
+      }
+    }
+  }, [blog, blogId]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -142,6 +152,18 @@ const BlogPost = ({ blog: initialBlog }: { blog: Blog } ) => {
     setBlog(initialBlog);
     setLikes(initialBlog.likeCount || 0);
     setDislikes(initialBlog.dislikeCount || 0);
+    
+    // Default to Urdu if slugUrdu matches current slug, otherwise check if we should show Urdu
+    const slugStr = Array.isArray(blogId) ? blogId[0] : blogId;
+    if (initialBlog.slugUrdu && slugStr === initialBlog.slugUrdu) {
+      setIsUrdu(true);
+    } else if (initialBlog.slug && slugStr === initialBlog.slug) {
+      // If on English slug, show English, otherwise default to Urdu
+      setIsUrdu(false);
+    } else {
+      // Default to Urdu on first load
+      setIsUrdu(true);
+    }
     
     // Properly set comments from database
     const blogComments = initialBlog.comments || [];
@@ -481,7 +503,7 @@ const handleCancelEdit = () => {
   {isUrdu ? "English" : "اردو"} 
 </button>
            </div>
-          <h1 dir="auto" className="text-5xl font-bold leading-tight mb-4 text-zinc-900 hover-lift transition-transform duration-300">
+          <h1 dir="auto" className="text-3xl font-bold leading-tight mb-4 text-zinc-900 hover-lift transition-transform duration-300">
             {isUrdu? blog?.titleUrdu : blog?.title}
           </h1>
           <div className="flex items-center gap-4 text-zinc-600 text-sm animate-fadeInUp" style={{animationDelay: "0.2s"}}>
@@ -512,7 +534,7 @@ const handleCancelEdit = () => {
               // 'dir' state ke mutabiq switch hoga taake alignment foran badal jaye
               dir={isUrdu ? "rtl" : "ltr"}
               // Class name bhi dynamic honi chahiye
-              className={`blog-content text-gray-700 leading-relaxed ${isUrdu ? 'urdu-text-style' : 'english-text-style'}`}
+              className={`blog-content text-gray-700 leading-relaxed ${isUrdu ? 'urdu-text-style ml-[15px]' : 'english-text-style'}`}
               dangerouslySetInnerHTML={{ __html: (isUrdu ? blog?.contentUrdu : blog?.content) || "" }}
             />
           </article>
@@ -666,7 +688,7 @@ const handleCancelEdit = () => {
       {/* Comments Section helo */}
       {showCommentSection && (
       <section className="max-w-4xl mx-auto px-6 py-12 border-b border-zinc-200">
-        <h3 className="text-2xl font-bold mb-6">Comments ({comments.length})</h3>
+        <h3 className="text-xl font-bold mb-6">Comments ({comments.length})</h3>
         
         {/* Add Comment Form */}
         <form onSubmit={handleAddComment} className="mb-8 p-4 bg-zinc-50 rounded-lg animate-fadeInUp hover-lift" style={{animationDelay: "0.5s"}}>

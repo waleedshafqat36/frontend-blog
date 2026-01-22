@@ -11,6 +11,7 @@ interface Blog {
   createdAt: string;
   image: string;
   content: string;
+  contentUrdu?: string;
   likeCount?: number;
   commentCount?: number;
   shareCount?: number;
@@ -31,27 +32,14 @@ interface TrendingArticlesProps {
   limit?: number;
 }
 
-// Calculate engagement score based on multiple factors
+// Calculate engagement score based on likes and comments only
 function calculateEngagementScore(blog: Blog): number {
-  const now = new Date().getTime();
-  const createdAt = new Date(blog.createdAt).getTime();
-  const ageInDays = (now - createdAt) / (1000 * 60 * 60 * 24);
-  
-  // Freshness factor (newer is better, but not too penalizing for older posts)
-  const freshnessScore = Math.max(0, 10 - ageInDays * 0.5);
-  
-  // Engagement metrics
+  // Simple ranking: Likes + Comments (no other factors)
   const likes = blog.likeCount || 0;
   const comments = blog.commentCount || 0;
-  const shares = blog.shareCount || 0;
-  const views = blog.viewCount || 1;
-  
-  // Engagement ratio calculation - Prioritize likes and comments
-  // Likes: 5x weight, Comments: 6x weight, Shares: 2x weight
-  const engagementRatio = (likes * 5 + comments * 6 + shares * 2) / Math.max(1, views);
-  
-  // Combined score: 30% freshness, 70% engagement (prioritize engagement more)
-  return freshnessScore * 0.3 + (engagementRatio * 10) * 0.7;
+
+  // Weighted score: Likes (2x weight) + Comments (3x weight)
+  return likes * 2 + comments * 3;
 }
 
 // Format large numbers (e.g., 1.2K, 1.5M)
@@ -164,9 +152,6 @@ export default function TrendingArticles({
         .trending-badge {
           background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
-        .engagement-bar {
-          background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
-        }
         .trending-card:hover {
           box-shadow: 0 20px 40px rgba(16, 185, 129, 0.15);
         }
@@ -235,9 +220,13 @@ export default function TrendingArticles({
 
                 {/* Preview */}
                 <p className="text-zinc-600 text-xs mb-2 line-clamp-1">
-                  {blog.content 
-                    ? blog.content.replace(/<[^>]*>/g, '').substring(0, 50) + '...' 
-                    : isUrdu ? 'مضمون' : 'Article'}
+                  {isUrdu 
+                    ? (blog.contentUrdu 
+                      ? blog.contentUrdu.replace(/<[^>]*>/g, '').substring(0, 50) + '...' 
+                      : 'مضمون')
+                    : (blog.content 
+                      ? blog.content.replace(/<[^>]*>/g, '').substring(0, 50) + '...' 
+                      : 'Article')}
                 </p>
 
                 {/* Engagement Metrics */}
@@ -257,13 +246,7 @@ export default function TrendingArticles({
                     </div>
                   </div>
 
-                  {/* Engagement Score Bar */}
-                  <div className="w-full bg-zinc-200 rounded-full h-1 overflow-hidden">
-                    <div 
-                      className="engagement-bar h-full transition-all duration-500"
-                      style={{ width: `${Math.min(100, (engagement.trendScore / 50) * 100)}%` }}
-                    ></div>
-                  </div>
+  
                 </div>
 
                 {/* CTA */}

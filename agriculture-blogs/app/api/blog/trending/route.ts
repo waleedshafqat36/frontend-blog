@@ -22,28 +22,14 @@ interface BlogDocument {
   updatedAt?: string;
 }
 
-// Calculate engagement score based on multiple factors
+// Calculate engagement score based on likes and comments only
 function calculateEngagementScore(blog: any): number {
-  const now = new Date().getTime();
-  const createdAt = new Date(blog.createdAt).getTime();
-  const ageInDays = (now - createdAt) / (1000 * 60 * 60 * 24);
-
-  // Freshness factor (newer is better)
-  const freshnessScore = Math.max(0, 10 - ageInDays * 0.3);
-
-  // Engagement metrics
+  // Simple ranking: Likes + Comments (no other factors)
   const likes = blog.likeCount || 0;
   const comments = blog.commentCount || 0;
-  const shares = blog.shareCount || 0;
-  const views = Math.max(1, blog.viewCount || 1);
 
-  // Weighted engagement calculation - Prioritize likes and comments
-  // Likes: 5x weight, Comments: 6x weight, Shares: 2x weight
-  const engagementRatio = (likes * 5 + comments * 6 + shares * 2) / views;
-  const engagementScore = Math.min(50, engagementRatio * 100);
-
-  // Combined score: 30% freshness, 70% engagement (prioritize engagement more)
-  return freshnessScore * 0.3 + engagementScore * 0.7;
+  // Weighted score: Likes (2x weight) + Comments (3x weight)
+  return likes * 2 + comments * 3;
 }
 
 // Calculate growth rate based on recent activity
@@ -66,8 +52,8 @@ export async function GET(req: NextRequest) {
   try {
     await connectDB();
 
-    // Fetch all blogs with engagement data
-    const blogs = await Blog.find({}).lean();
+    // Fetch all blogs with engagement data - explicitly include comments
+    const blogs = await Blog.find({}).select('+comments').lean();
 
     if (!blogs || blogs.length === 0) {
       return NextResponse.json(
