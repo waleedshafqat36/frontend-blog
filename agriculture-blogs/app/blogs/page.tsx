@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import {  X, ThumbsUp } from 'lucide-react';
+import {  X, ThumbsUp, ArrowUpRight, Clock, Sparkles, Flame, ArrowRight, FlameIcon, ChevronRight } from 'lucide-react';
 import { FaThumbsUp } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 // import { BsInstagram, BsTwitter } from 'react-icons/bs';
@@ -16,6 +16,8 @@ interface Article {
   likedBy?: string[];
   createdAt?: string;
   slug?: string;
+  author:string;
+  category:string
 }
 
 interface User {
@@ -154,34 +156,6 @@ const AgricultureBlog = () => {
     fetchArticles();
   }, []);
 
-const otherPosts = [
-  { 
-    id: 1, 
-    title: "Kapas ki munasib kash aur beej ka intekhab", 
-    img: "https://images.unsplash.com/photo-1594904351111-a072f80b1a71?q=80&w=200" 
-  },
-  { 
-    id: 2, 
-    title: "Jadeed kisaan: Tunnel farming se munafa kaise kamayein?", 
-    img: "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?q=80&w=200" 
-  },
-  { 
-    id: 3, 
-    title: "Sardiyon mein sabziyon ki dekh bhaal ke aham mashwaray", 
-    img: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?q=80&w=200" 
-  },
-  { 
-    id: 4, 
-    title: "Khadon ka mutawazin istemal aur zameen ki zarkhezi", 
-    img: "https://images.unsplash.com/photo-1560493676-04071c5f467b?q=80&w=200" 
-  },
-  { 
-    id: 5, 
-    title: "Dhaan ki fasal ko bimariyon se bachane ka tariqa", 
-    img: "https://images.unsplash.com/photo-1530507629858-e4977d30e9e0?q=80&w=400" 
-  },
-
-];;
 
 
   return (
@@ -349,199 +323,104 @@ const otherPosts = [
         }
       `}</style>
 
-      {/* --- NAVBAR --- */}
-     
-
-      {/* --- HERO SECTION --- */}
+<div className="max-w-7xl mx-auto px-6 py-12 font-sans selection:bg-green-100">
     
-    <div className="max-w-7xl mx-auto px-4 py-10 font-sans">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+    <div className="max-w-7xl mx-auto px-6  font-sans selection:bg-green-100 selection:text-green-900">
+      <style>{`
+        @keyframes subtle-bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
+        }
+        .animate-subtle-bounce { animation: subtle-bounce 3s ease-in-out infinite; }
         
-        {/* Left Side: Main Featured Post */}
-    <div className="lg:col-span-2 relative group cursor-pointer overflow-hidden rounded-2xl h-112.5">
-  {/* Agriculture Image */}
-  <img 
-    src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?q=80&w=1200" 
-    alt="Gandum ki Kasht" 
-    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-  />
-  
-  {/* Dark Overlay with Gradient */}
-  <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-8">
-    
-    {/* Category Tag */}
-    <span className="bg-green-600/40 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full w-fit mb-4 border border-green-400/30">
-      Agriculture
-    </span>
-    
-    {/* Title */}
-    <h1 className="text-white text-3xl md:text-4xl font-bold leading-tight max-w-lg">
-      Gandum ki Bumper Paidawar: Jadeed Zarai Tareeqay aur Dekh Bhaal
-    </h1>
-    
-    {/* Optional: Chota sa description ya date */}
-    <p className="text-gray-300 text-sm mt-3">
-      Dr. Zahid • January 9, 2026
-    </p>
-  </div>
-</div>
+        .glass-tag {
+          background: rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .bento-card-hover {
+          transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .bento-card-hover:hover {
+          box-shadow: 0 30px 60px -12px rgba(22, 101, 52, 0.15);
+        }
+      `}</style>
 
-        {/* Right Side: Other Featured Posts */}
-        <div className="flex flex-col gap-6">
-          <h2 className="text-xl font-bold text-gray-900 border-b pb-2">Other featured posts</h2>
-          <div className="flex flex-col gap-5">
-            {otherPosts.map((post) => (
-              <div key={post.id} className="flex gap-4 items-center group cursor-pointer">
-                <div className="shrink-0 w-24 h-16 overflow-hidden rounded-xl">
-                  <img 
-                    src={post.img} 
-                    alt={post.title} 
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                  />
-                </div>
-                <h3 className="text-sm font-semibold text-gray-800 leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
-                  {post.title}
-                </h3>
-              </div>
-            ))}
-          </div>
+      {/* --- REFINED HEADER --- */}
+      {/* <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8"> */}
+        
+      {/* --- TRENDING ARTICLES --- */}
+<section className="max-w-7xl mx-auto px-6 py-20">
+  {/* Centered Header Section */}
+  <div className="mb-20 flex flex-col items-center text-center animate-fadeInUp">
+    <span className="text-green-600 font-black tracking-[0.3em] text-[10px] uppercase mb-4">
+      Expert Analysis
+    </span>
+    <h2 className="text-5xl md:text-5xl font-black mb-6 tracking-tighter text-zinc-900 leading-none">
+      Trending <span className="text-green-600 italic">Insights.</span>
+    </h2>
+    <div className="h-1 w-20 bg-green-600 rounded-full animate-grow"></div>
+  </div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-start">
+  {articles.map((article, index) => (
+    <div 
+       onClick={()=>router.push(`/blogs/${article?.slug}`)}
+      key={index} 
+      className="group cursor-pointer flex flex-col bg-white rounded-[1.5rem] overflow-hidden border border-zinc-100 hover:shadow-xl transition-all duration-500 h-auto"
+    >
+      {/* 1. Controlled Image Height */}
+      <div className="relative h-48 overflow-hidden shrink-0">
+        <img 
+     
+          src={article?.image || ''} 
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          alt={article?.title}
+        />
+        <div className="absolute top-3 left-3">
+          <span className="bg-white px-3 py-1 text-[10px] hover:text-white hover:bg-green-600 rounded-2xl font-black uppercase tracking-widest shadow-sm">
+            {article?.category || 'Agriculture'}
+          </span>
+        </div>
+      </div>
+
+      {/* 2. Natural Content Flow (No flex-grow) */}
+      <div className="p-5 flex flex-col">
+        <div className="flex items-center gap-2 mb-2 text-[9px] font-bold text-zinc-400 uppercase tracking-widest">
+          <span>{article.author || 'Bilal'}</span>
+          <span className="w-1 h-1 bg-zinc-200 rounded-full"></span>
+          <span>Jan 22</span>
         </div>
 
+        <h3 className="text-xl font-extrabold mb-2 leading-tight text-zinc-900 group-hover:text-green-600 transition-colors line-clamp-2">
+          {article?.title || "Beekeeping: A Sweet Source..."}
+        </h3>
+        
+        <p className="text-zinc-500 text-xs mb-5 leading-relaxed line-clamp-2">
+          {article?.content?.replace(/<[^>]*>/g, '').slice(0, 80)}...
+        </p>
+
+        {/* 3. Action Button close to content */}
+        <div className="pt-4 border-t border-zinc-50 flex items-center justify-between">
+          <button className="text-[10px] font-black uppercase tracking-widest text-zinc-900 flex items-center gap-2 group/btn">
+            Read Article
+            <div className="w-7 h-7 rounded-full border border-zinc-200 flex items-center justify-center group-hover/btn:bg-zinc-900 group-hover/btn:text-white transition-all">
+              <ChevronRight size={12} />
+            </div>
+          </button>
+        </div>
       </div>
     </div>
+  ))}
+</div>
+</section>
 
-      {/* --- TRENDING ARTICLES --- */}
-      <section className="max-w-7xl mx-auto px-8 md:px-16 py-16">
-        <div className="mb-12 animate-fadeInUp">
-          <h2 className="text-4xl font-bold mb-2 bg-linear-to-r from-green-700 to-green-600 bg-clip-text text-transparent animate-slideUp hover:scale-105 transition-transform duration-300 inline-block">
-            Our Trending Articles
-          </h2>
-          <div className="h-1 w-20 bg-linear-to-r from-green-600 to-green-400 rounded-full animate-grow"></div>
-          <p className="text-zinc-500 text-sm mt-4 max-w-2xl animate-slideUp" style={{animationDelay: '0.2s'}}>
-            Discover the latest insights and trends in sustainable agriculture. Explore expert articles on farming, agri-tech, and organic solutions.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-4 gap-8 px-2 md:px-0">
-          {articles.map((article, index) => (
-            
-            <div 
-              key={index} 
-              className="group cursor-pointer card-loader px-3 py-2 rounded-2xl hover:bg-green-50/50 transition-all duration-300 relative"
-              style={{
-                animation: loadedCards.has(article._id) ? 'slideUp 0.6s ease-out forwards' : 'none',
-                animationDelay: loadedCards.has(article._id) ? `${index * 0.1}s` : '0s'
-              }}
-            >
-              {/* Glow background effect */}
-              <div className="absolute inset-0 bg-linear-to-br from-green-200/0 to-green-100/0 group-hover:from-green-200/20 group-hover:to-green-100/20 rounded-2xl transition-all duration-500"></div>
-              
-              <div className="relative z-10">
-                <div className="overflow-hidden rounded-2xl mb-4 relative cursor-pointer group/image" onClick={() => router.push(`/blogs/${article?.slug}`)}>
-                  {/* Gradient overlay on hover */}
-                  <div className="absolute inset-0 bg-linear-to-br from-green-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
-                  
-                  <img 
-                    src={article?.image || ''} 
-                    alt="Agriculture" 
-                    className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-700 ease-out cursor-pointer"
-                  />
-                  
-                  {/* Dark overlay on hover */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-all duration-300 rounded-2xl"></div>
-                  
-                  {/* Featured badge with animation */}
-                  <div className="absolute top-3 right-3 bg-linear-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-105 shadow-lg">
-                    Featured
-                  </div>
-                </div>
-                
-                <h3 className="font-bold text-lg mb-2 leading-tight text-zinc-900 group-hover:text-green-600 transition-colors duration-300 line-clamp-2">
-                  {article?.title}
-                </h3>
-                
-                <p className="text-zinc-500 text-xs mb-4 leading-relaxed line-clamp-2">
-                  {truncateContent(article?.content || '', 100)}
-                </p>
-                
-                <div className="flex items-center justify-between gap-4">
-                  <button
-                    onClick={() => router.push(`/blogs/${article?.slug}`)}
-                    className="text-xs font-bold text-green-600 flex items-center gap-1 hover:text-green-700 hover:gap-2 transition-all duration-300 group/btn"
-                  >
-                    Learn More 
-                    <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center text-[10px] group-hover/btn:bg-green-600 group-hover/btn:text-white transition-all duration-300 transform group-hover/btn:scale-110">✓</div>
-                  </button>
-                  
-                  <div className="flex items-center bg-green-200 gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-600">
-                    {article.createdAt ? new Date(article.createdAt).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'short', 
-                      day: 'numeric' 
-                    }) : 'Date unavailable'}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* --- FOOTER --- */}
     
 
-      {/* --- MODAL --- */}
-      {selectedArticle && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white flex items-center justify-between p-6 border-b">
-              <h2 className="text-2xl font-bold text-zinc-900">Article Details</h2>
-              <button
-                onClick={() => setSelectedArticle(null)}
-                className="text-zinc-500 hover:text-zinc-700"
-              >
-                <X size={24} />
-              </button>
-            </div>
-            
-            <div className="p-6">
-              <img 
-                src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=800" 
-                alt={selectedArticle?.title || 'Article'}
-                className="w-full h-64 object-cover rounded-lg mb-6"
-              />
-              
-              <h3 className="text-2xl font-bold mb-4 text-zinc-900">
-                {selectedArticle?.title}
-              </h3>
-              
-              <div className="space-y-4 text-zinc-700 leading-relaxed prose prose-sm max-w-full">
-                <div dangerouslySetInnerHTML={{ __html: selectedArticle?.fullContent || '' }} />
-              </div>
-
-              <div className="mt-8 flex gap-4">
-                <button
-                  onClick={() => {
-                    if (selectedArticle?._id) {
-                      setSelectedArticle(null);
-                      router.push(`/blogs/${selectedArticle._id}`);
-                    }
-                  }}
-                  className="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition"
-                >
-                  Read Full Article
-                </button>
-                <button
-                  onClick={() => setSelectedArticle(null)}
-                  className="flex-1 bg-zinc-200 text-zinc-900 py-3 rounded-lg font-bold hover:bg-zinc-300 transition"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+ 
+    </div>
+    </div>
     </div>
   );
 };

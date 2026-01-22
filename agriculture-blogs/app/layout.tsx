@@ -5,9 +5,7 @@ import Navbar from "../components/layout/Navbar";
 import Script from "next/script"; // 1. Script component import karein
 
 import "./globals.css"; 
-import { Send } from "lucide-react";
-import { FaFacebook, FaLinkedin } from "react-icons/fa";
-import { BsInstagram, BsTwitter } from "react-icons/bs";
+
 import Footer from "@/components/layout/Footer";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -48,7 +48,7 @@ interface User {
   role: string;
 }
 
-const BlogPost = ({ blog: initialBlog }: { blog: Blog }) => {
+const BlogPost = ({ blog: initialBlog }: { blog: Blog } ) => {
 
   const router = useRouter();
   const [blog, setBlog] = useState<Blog | null>(null);
@@ -73,12 +73,20 @@ const BlogPost = ({ blog: initialBlog }: { blog: Blog }) => {
   const params = useParams();
   const blogId = params.id as string | string[] | undefined;
   const [isUrdu, setIsUrdu] = useState(false);
-  const [lastFetchedLikes, setLastFetchedLikes] = useState(0);
+  // const [lastFetchedLikes, setLastFetchedLikes] = useState(0);
   const [showShareMenu, setShowShareMenu] = useState(false);
 
+ console.log(blog);
+ 
   const toggleLanguage = useCallback((langCode: 'en' | 'ur') => {
     setIsUrdu(langCode === 'ur');
-  }, []);
+    if (langCode === "ur" && blog?.slugUrdu) {
+    router.push(`/blog/${blog.slugUrdu}`); 
+  } 
+  else if (langCode === "en" && blog?.slug) {
+    router.push(`/blog/${blog.slug}`);
+  }
+  }, [blog, router]);
 
   useEffect(() => {
     if (isUrdu) {
@@ -334,7 +342,7 @@ const handleCancelEdit = () => {
       
       
       if (response.ok) {
-        const data = await response.json();
+       await response.json();
         setComments(prev =>
         prev.map(c =>
           c._id === editingCommentId
@@ -499,9 +507,6 @@ const handleCancelEdit = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content - Left Side (3 columns) */}
           <article className={`lg:col-span-3 pl-15 ${isUrdu ? 'urdu-mode' : 'english-mode'}`}>
-            {/* 1. Google Translate Container (Isay hidden mat karein, bas small kar dein) */}
-            {/* <div id="google_translate_element" style={{ opacity: 0, height: '1px', position: 'absolute' }}></div> */}
-            
             {/* 2. Content Div */}
             <div
               // 'dir' state ke mutabiq switch hoga taake alignment foran badal jaye

@@ -42,7 +42,7 @@ const blogSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, "Category is required"],
-    enum: ["Agriculture", "Agri-Tech", "Sustainability", "Organic Farming"],
+    enum: ["Agriculture", "Agri-Tech", "Sustainability", "Organic Farming", ],
     default: "Agriculture"
   },
   content: {
@@ -97,5 +97,5 @@ const blogSchema = new mongoose.Schema({
   timestamps: true 
 });
 
-const Blog = mongoose.models.detailblog || mongoose.model("detailblog", blogSchema);
+const Blog = mongoose.models.detail || mongoose.model("detail", blogSchema);
 export default Blog;

@@ -6,6 +6,7 @@ import ShareSection from "./ShareSection";
 interface BlogInteractiveWrapperProps {
   blogId: string;
   title: string;
+  slugUrdu:string;
   initialLikes?: number;
   initialDislikes?: number;
   initialLikedBy?: string[];
@@ -17,6 +18,7 @@ interface BlogInteractiveWrapperProps {
 export default function BlogInteractiveWrapper({
   blogId,
   title,
+  slugUrdu,
   initialLikes = 0,
   initialDislikes = 0,
   initialLikedBy = [],
@@ -28,6 +30,7 @@ export default function BlogInteractiveWrapper({
     <>
       <BlogInteractive
         blogId={blogId}
+        slugUrdu={slugUrdu}
         initialLikes={initialLikes}
         initialDislikes={initialDislikes}
         initialLikedBy={initialLikedBy}

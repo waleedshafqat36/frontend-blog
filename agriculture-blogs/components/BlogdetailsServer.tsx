@@ -1,4 +1,4 @@
-import { ThumbsUp, ArrowRight } from "lucide-react";
+
 import BlogInteractiveWrapper from "./BlogInteractiveWrapper";
 import BlogLanguageToggle from "./BlogLanguageToggle";
 import { ReactNode } from "react";
@@ -6,7 +6,7 @@ import { ReactNode } from "react";
 interface Blog {
   _id: string;
   slug: string;
-  slugUrdu?: string;
+  slugUrdu: string;
   title: string;
   titleUrdu?: string;
   category: string;
@@ -105,6 +105,7 @@ export default async function BlogPost({ blog: initialBlog }: { blog: Blog }): P
         <BlogInteractiveWrapper
           blogId={initialBlog.slug}
           title={initialBlog.title}
+          slugUrdu={initialBlog.slugUrdu}
           initialLikes={initialBlog.likeCount || 0}
           initialDislikes={initialBlog.dislikeCount || 0}
           initialLikedBy={initialBlog.likedBy || []}

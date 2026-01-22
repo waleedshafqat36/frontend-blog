@@ -23,8 +23,9 @@ interface User {
   role: string;
 }
 
-export default function BlogInteractive({ blogId, initialLikes = 0, initialDislikes = 0, initialLikedBy = [], initialDislikedBy = [], initialComments = [], isUrdu = false }: { 
+export default function BlogInteractive({ blogId, slugUrdu, initialLikes = 0, initialDislikes = 0, initialLikedBy = [], initialDislikedBy = [], initialComments = [], isUrdu = false }: { 
   blogId: string; 
+  slugUrdu:string
   initialLikes?: number;
   initialDislikes?: number;
   initialLikedBy?: string[];
@@ -192,7 +193,7 @@ export default function BlogInteractive({ blogId, initialLikes = 0, initialDisli
       console.error("Error updating comment:", error);
     }
   };
-
+// 
   const handleDeleteComment = async (commentId: string) => {
     try {
       const response = await fetch(`/api/blog/${blogId}/comment`, {
