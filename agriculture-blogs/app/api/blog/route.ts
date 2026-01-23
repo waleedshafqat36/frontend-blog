@@ -36,8 +36,6 @@ export async function GET() {
     let titleUrdu = toStr('titleUrdu')
     let contentUrdu = toStr('contentUrdu')
     let author = toStr('author')
-    let category = toStr('category')
-    let subCategory = toStr('SubCategory')
     let content = toStr('content')
     const file = formData.get("image") as File | null;
 
@@ -69,7 +67,6 @@ export async function GET() {
     title = title.trim()
     titleUrdu = titleUrdu.trim()
     author = author.trim()
-    category = category || 'Agriculture'
     content = content || ''
     contentUrdu = contentUrdu || ''
 
@@ -100,8 +97,7 @@ export async function GET() {
       titleUrdu,
       slugUrdu:urduSlug,
       author,
-      category,
-      SubCategory: subCategory ? [subCategory] : [],
+      SubCategory: [],
       content,
       contentUrdu,
       image: uploadResponse.secure_url // Cloudinary link

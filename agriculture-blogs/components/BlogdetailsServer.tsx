@@ -8,7 +8,6 @@ interface Blog {
   slugUrdu: string;
   title: string;
   titleUrdu?: string;
-  category: string;
   author: string;
   createdAt: string;
   image: string;
@@ -22,16 +21,12 @@ interface Blog {
   SubCategory?: string[];
 }
 
-async function getRelatedBlogs(category: string, currentId: string) {
+async function getRelatedBlogs(blogId: string) {
   try {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-    const res = await fetch(`${siteUrl}/api/blog`);
+    const res = await fetch(`${siteUrl}/api/blog/related?id=${blogId}&limit=3`);
     const data = await res.json();
-    const filtered = data.blogs.filter((b: Blog) => 
-      b._id !== currentId && 
-      b.category === category
-    );
-    return filtered.slice(0, 3);
+    return data.blogs || [];
   } catch (err) {
     console.log("Related fetch error", err);
     return [];
@@ -62,7 +57,7 @@ export default async function BlogPost({ blog: initialBlog }: { blog: Blog }): P
   }
 
   const trendingBlogs = await getTrendingBlogs();
-  const relatedBlogs = await getRelatedBlogs(initialBlog.category, initialBlog._id);
+  const relatedBlogs = await getRelatedBlogs(initialBlog._id);
 
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900">

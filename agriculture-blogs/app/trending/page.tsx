@@ -16,15 +16,12 @@ interface Blog {
   commentCount?: number;
   shareCount?: number;
   viewCount?: number;
-  category?: string;
 }
 
 export default function TrendingPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [filteredBlogs, setFilteredBlogs] = useState<Blog[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortBy, setSortBy] = useState<"trend" | "recent" | "views">("trend");
-  const [categories, setCategories] = useState<string[]>([]);
   const [isUrdu, setIsUrdu] = useState(false);
 
   useEffect(() => {
@@ -35,10 +32,6 @@ export default function TrendingPage() {
 
         if (data.blogs) {
           setBlogs(data.blogs);
-
-          // Extract unique categories
-        const uniqueCategories = ["All", ...new Set(data.blogs.map((b: Blog) => b.category || ""))] as string[];
-          setCategories(uniqueCategories);
         }
       } catch (error) {
         console.error("Error fetching trending blogs:", error);
@@ -49,12 +42,9 @@ export default function TrendingPage() {
   }, []);
 
   useEffect(() => {
-    // Filter by category
-    let filtered = blogs.filter((blog) =>
-      selectedCategory === "All" ? true : blog.category === selectedCategory
-    );
-
     // Sort based on selected option
+    let filtered = [...blogs];
+
     if (sortBy === "recent") {
       filtered.sort(
         (a, b) =>
@@ -72,7 +62,7 @@ export default function TrendingPage() {
     }
 
     setFilteredBlogs(filtered);
-  }, [blogs, selectedCategory, sortBy]);
+  }, [blogs, sortBy]);
 
   const handleLanguageToggle = () => {
     setIsUrdu(!isUrdu);
@@ -108,30 +98,7 @@ export default function TrendingPage() {
 
       {/* Filters */}
       <section className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
-          {/* Category Filter */}
-          <div className="flex items-center gap-4 flex-wrap">
-            <span className="flex items-center gap-2 text-sm font-semibold text-zinc-700">
-              <Filter size={18} />
-              {isUrdu ? "زمرہ" : "Category"}:
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-full transition font-medium text-sm ${
-                    selectedCategory === cat
-                      ? "bg-green-600 text-white shadow-lg"
-                      : "bg-zinc-200 text-zinc-700 hover:bg-zinc-300"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-
+        <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-end">
           {/* Sort Options */}
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-2 text-sm font-semibold text-zinc-700">
@@ -175,8 +142,8 @@ export default function TrendingPage() {
             </h3>
             <p className="text-zinc-600">
               {isUrdu
-                ? "اس زمرے میں کوئی ٹریندنگ مضامین دستیاب نہیں ہیں"
-                : "No trending articles found in this category"}
+                ? "اس وقت کوئی ٹریندنگ مضامین دستیاب نہیں ہیں"
+                : "No trending articles found at the moment"}
             </p>
           </div>
         </section>

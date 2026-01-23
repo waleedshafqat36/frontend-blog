@@ -208,7 +208,7 @@ export default function BlogLanguageToggle({
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Main Content - Left Side (3 columns) */}
-            <article className={`lg:col-span-3 pl-15 ${isUrdu ? 'urdu-mode' : 'english-mode'}`}>
+            <article className={`lg:col-span-3 ${isUrdu ? 'pr-[60px]' : 'pl-[60px]'}`}>
               <div
                 dir={isUrdu ? "rtl" : "ltr"}
                 className={`blog-content text-gray-700 leading-relaxed ${isUrdu ? 'urdu-text-style' : 'english-text-style'}`}

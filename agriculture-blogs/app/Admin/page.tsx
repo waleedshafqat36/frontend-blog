@@ -10,7 +10,6 @@ const AddBlogForm = () => {
     title: "",
     author:"  ",
     titleUrdu: "",
-    category: "Agriculture",
     contentUrdu: "", 
     content: "", // HTML from TipTap
   })
@@ -102,7 +101,6 @@ const [isUrdu, setIsUrdu] = useState(false);
     data.append("contentUrdu", urduContent)
     data.append("isUrdu", String(isUrdu))
     data.append("author", formData.author) // Author from logged-in user
-    data.append("category", formData.category)
     data.append("content", englishContent)
     if (image) data.append("image", image)
 
@@ -317,8 +315,6 @@ const [isUrdu, setIsUrdu] = useState(false);
             {formData.title || (isUrdu ? "آپ کا عنوان یہاں نظر آئے گا" : "Your Title Here")}
           </h4>
           <div className="flex items-center italic pl-3 gap-2 text-green-400 text-[11px] font-medium uppercase tracking-widest">
-            <span>{formData.category || "Agriculture"}</span>
-            <span>•</span>
             <span>{formData.author || "Author"}</span>
           </div>
         </div>
@@ -380,34 +376,6 @@ const [isUrdu, setIsUrdu] = useState(false);
   
   {/* Modern Decorative Accent */}
   <div className="absolute top-0 right-0 w-32 h-32 bg-green-50/50 rounded-full blur-[60px] -mr-10 -mt-10 group-hover:bg-green-100/50 transition-colors duration-700"></div>
-
-  {/* SECTION HEADER */}
-  {/* <div className="relative z-10 space-y-1">
-    <h4 className="text-slate-900 font-black text-xl tracking-tight">Post <span className="text-green-500">Settings</span></h4>
-    <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em]">Finalize & Verify Details</p>
-  </div> */}
-
-  {/* CATEGORY SELECT */}
-  <div className="relative z-10 space-y-3">
-    <label className="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2 ml-1">
-      <Layout size={14} className="text-green-500" /> Category
-    </label>
-    <div className="relative">
-      <select
-        name="category"
-        value={formData.category}
-        onChange={handleChange}
-        className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl px-6 py-4.5 focus:bg-white focus:ring-4 focus:ring-green-50 focus:border-green-500 outline-none font-bold text-sm text-slate-700 appearance-none cursor-pointer transition-all"
-      >
-        <option value="Agriculture">Agriculture</option>
-        <option value="Agri-Tech">Agri-Tech</option>
-        <option value="Sustainability">Sustainability</option>
-      </select>
-      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-        <ChevronDown size={18} />
-      </div>
-    </div>
-  </div>
 
   {/* AUTHOR INPUT */}
   <div className="relative z-10 space-y-3">

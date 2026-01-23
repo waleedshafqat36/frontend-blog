@@ -19,7 +19,6 @@ interface Article {
   createdAt?: string;
   slug?: string;
   author:string;
-  category:string
 }
 
 interface User {
@@ -32,6 +31,7 @@ interface User {
 const AgricultureBlog = () => {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [user, setUser] = useState<User | null>(null);
   const [userId, setUserId] = useState<string>("");
   const [articleLikes, setArticleLikes] = useState<{ [key: string]: number }>({});
@@ -367,37 +367,69 @@ const AgricultureBlog = () => {
       BLOGS <span className="text-green-600 ">MARKET</span>
     </h2>
     
-    {/* Language Toggle Buttons */}
-    <div className="flex items-center gap-3 mb-8">
-      <button 
-        onClick={() => setIsUrdu(false)}
-        className={`px-6 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${
-          !isUrdu 
-            ? 'bg-green-600 text-white shadow-lg' 
-            : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
-        }`}
-      >
-        English
-      </button>
-      <button 
-        onClick={() => setIsUrdu(true)}
-        className={`px-6 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${
-          isUrdu 
-            ? 'bg-green-600 text-white shadow-lg' 
-            : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
-        }`}
-      >
-        اردو
-      </button>
+    {/* Search and Language Toggle Buttons */}
+    <div className="flex items-center gap-4 mb-8 flex-wrap">
+      {/* Search Input */}
+      <div className="relative flex-1 min-w-xs">
+        <input 
+          type="text"
+          placeholder={isUrdu ? "بلاگز تلاش کریں..." : "Search blogs..."}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className={`w-full px-4 py-2.5 rounded-lg border border-zinc-300 bg-white text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all ${isUrdu ? 'pr-10 pl-4 text-right' : 'pl-10 pr-4 text-left'}`}
+          dir={isUrdu ? "rtl" : "ltr"}
+        />
+        <svg 
+          className={`absolute top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-400 ${isUrdu ? 'left-3' : 'right-3'}`}
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+
+      {/* Language Toggle Buttons */}
+      <div className="flex items-center gap-3">
+        <button 
+          onClick={() => setIsUrdu(false)}
+          className={`px-6 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${
+            !isUrdu 
+              ? 'bg-green-600 text-white shadow-lg' 
+              : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+          }`}
+        >
+          English
+        </button>
+        <button 
+          onClick={() => setIsUrdu(true)}
+          className={`px-6 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider transition-all ${
+            isUrdu 
+              ? 'bg-green-600 text-white shadow-lg' 
+              : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+          }`}
+        >
+          اردو
+        </button>
+      </div>
     </div>
   </div>
 
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-start" dir={isUrdu ? "rtl" : "ltr"}>
-  {articles.map((article, index) => (
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-stretch" dir={isUrdu ? "rtl" : "ltr"}>
+  {articles
+    .filter((article) => {
+      const searchLower = searchQuery.toLowerCase();
+      const titleMatch = article.title?.toLowerCase().includes(searchLower);
+      const titleUrduMatch = article.titleUrdu?.toLowerCase().includes(searchLower);
+      const contentMatch = article.content?.toLowerCase().includes(searchLower);
+      const authorMatch = article.author?.toLowerCase().includes(searchLower);
+      return titleMatch || titleUrduMatch || contentMatch || authorMatch;
+    })
+    .map((article, index) => (
     <div 
        onClick={()=>router.push(`/blogs/${article?.slug}`)}
       key={index} 
-      className="group cursor-pointer flex flex-col bg-white rounded-xl overflow-hidden border border-zinc-100 hover:shadow-lg transition-all duration-500 h-auto"
+      className="group cursor-pointer flex flex-col bg-white rounded-xl overflow-hidden border border-zinc-100 hover:shadow-lg transition-all duration-500 h-full"
     >
       {/* 1. Controlled Image Height */}
       <div className="relative h-32 overflow-hidden shrink-0">
@@ -409,8 +441,8 @@ const AgricultureBlog = () => {
         />
       </div>
 
-      {/* 2. Natural Content Flow (No flex-grow) */}
-      <div className="p-3 flex flex-col" dir={isUrdu ? "rtl" : "ltr"}>
+      {/* 2. Content with flex-grow to fill remaining space */}
+      <div className="p-3 flex flex-col flex-grow" dir={isUrdu ? "rtl" : "ltr"}>
         <div className="flex items-center gap-2 mb-1.5 text-[8px] font-bold text-zinc-400 uppercase tracking-widest">
           <span>{article.author || 'Bilal'}</span>
           <span className="w-0.5 h-0.5 bg-zinc-200 rounded-full"></span>
@@ -435,8 +467,8 @@ const AgricultureBlog = () => {
             : article?.content?.replace(/<[^>]*>/g, '').slice(0, 80)}...
         </p>
 
-        {/* 3. Action Button close to content */}
-        <div className="pt-2 border-t border-zinc-50 flex items-center justify-between">
+        {/* 3. Action Button at the bottom */}
+        <div className="pt-2 border-t border-zinc-50 flex items-center justify-between mt-auto">
          <button
   className="
     group/btn

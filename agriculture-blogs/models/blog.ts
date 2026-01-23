@@ -39,12 +39,6 @@ const blogSchema = new mongoose.Schema({
     required: [true, "Author name is required"],
     trim: true
   },
-  category: {
-    type: String,
-    required: [true, "Category is required"],
-    enum: ["Agriculture", "Agri-Tech", "Sustainability", "Organic Farming", ],
-    default: "Agriculture"
-  },
   content: {
     type: String,
     required: [true, "Blog content is required"]
