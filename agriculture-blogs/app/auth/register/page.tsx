@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function RegisterPage() {
@@ -6,8 +7,9 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -15,8 +17,27 @@ export default function RegisterPage() {
       return;
     }
 
-    console.log("Name:", name, "Email:", email, "Password:", password);
-    alert("Signup form submitted! (UI only)");
+    try {
+      const response = await fetch("/api/signup.auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+    
+
+      if (response.ok) {
+        router.push("/auth/login");
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      alert("An error occurred. Please try again.");
+    }
   };
 
   return (

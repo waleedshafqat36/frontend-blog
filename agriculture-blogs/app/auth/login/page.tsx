@@ -1,15 +1,45 @@
 "use client"; // Required for useState & interactivity
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Email:", email, "Password:", password);
-    alert("Login form submitted! (UI only)");
+    try {
+      // Call your login API
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        if (data.user) {
+          // Store user data in localStorage
+          localStorage.setItem("user", JSON.stringify(data.user));
+          console.log("User data stored:", data.user);
+
+          // Redirect to homepage for all users
+          router.push("/");
+        }
+      } else {
+        // Handle login failure
+        const errorData = await response.json();
+        alert(errorData.message || "Login failed. Please check your credentials.");
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      alert("An error occurred. Please try again.");
+    }
   };
 
   return (
